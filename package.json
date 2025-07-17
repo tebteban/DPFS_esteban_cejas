@@ -1,0 +1,23 @@
+{
+  "name": "dpfs_esteban_cejas-1",
+  "version": "1.0.0",
+  "description": "SpikeShop. Sitio dedicado a vender todo lo que un jugador de voely necesita, con foco en voley indoor.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tebteban/DPFS_esteban_cejas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tebteban/DPFS_esteban_cejas/issues"
+  },
+  "homepage": "https://github.com/tebteban/DPFS_esteban_cejas#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
