@@ -29,35 +29,7 @@
 </head>
 <body class="bg-cyan-50">
     <div class="min-h-screen flex flex-col">
-        <header class="bg-white shadow-sm">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center py-4">
-                    <div class="flex items-center space-x-2">
-                        <span class="material-icons text-cyan-500">sports_volleyball</span>
-                        <span class="font-bold text-xl text-gray-800">SPIKESHOP</span>
-                    </div>
-                    <nav class="hidden md:flex items-center space-x-8">
-                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="/">HOGAR</a>
-                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="/productos">PRODUCTOS</a>
-                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="#">SOBRE NOSOTROS</a>
-                        <a class="flex items-center text-gray-600 hover:text-cyan-500 transition-colors" href="#">
-                            <span>CONTÁCTENOS</span>
-                            <span class="material-icons">expand_more</span>
-                        </a>
-                    </nav>
-                    <div class="hidden md:flex items-center space-x-4">
-                        <a class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition-colors inline-flex items-center justify-center" href="/register">Unirse</a>
-                        <a class="px-6 py-2 bg-cyan-500 text-white rounded-full hover:bg-cyan-600 transition-colors inline-flex items-center justify-center" href="/sign_in">Acceso</a>
-                        <a href="/cart" class="relative">
-                            <span class="material-icons text-gray-600 hover:text-cyan-500">shopping_cart</span>
-                        </a>
-                    </div>
-                    <button class="md:hidden">
-                        <span class="material-icons">menu</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+        <%- include('../partials/header') %>
 
         <main class="flex-grow flex items-center justify-center p-4 py-8">
             <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
