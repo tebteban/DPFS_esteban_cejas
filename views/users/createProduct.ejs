@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>subir productos - Spikeshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Estilos adicionales para los inputs de tipo file (opcional, para una mejor visualización) */
+        input[type="file"]::file-selector-button {
+            background-color: #38bdf8; /* cian-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-right: 1rem;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: #06b6d4; /* cian-600 */
+        }
+    </style>
+</head>
+<body class="bg-cyan-50">
+    <div class="min-h-screen flex flex-col">
+        <%- include('../partials/header') %>
+
+        <main class="flex-grow flex items-center justify-center p-4 py-8">
+            <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Cargar Nuevo Producto</h2>
+                
+                <form action="/createProduct" method="POST" class="space-y-6">
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="productName">Nombre del Producto</label>
+                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="productName" name="productName" type="text" placeholder="Balón Oficial de Voleibol" required/>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="description">Descripción</label>
+                        <textarea class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="description" name="description" rows="4" placeholder="Descripción detallada del producto..." required></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="price">Precio ($)</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="price" name="price" type="number" step="0.01" min="0" placeholder="Ej: 55.99" required/>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="stock">Stock</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="stock" name="stock" type="number" min="0" placeholder="Ej: 100" required/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="category">Categoría</label>
+                        <div class="relative">
+                            <select class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500" id="category" name="category" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="balones">Balones</option>
+                                <option value="zapatillas">Zapatillas</option>
+                                <option value="indumentaria">Indumentaria</option>
+                                <option value="accesorios">Accesorios</option>
+                            </select>
+                            <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">arrow_drop_down</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="imageUrl">URL de la Imagen (o Subir Archivo)</label>
+                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="imageUrl" name="imageUrl" type="text" placeholder="https://ejemplo.com/imagen.jpg o /img/tu_imagen.jpg"/>
+                        
+                        <p class="text-center text-sm text-gray-500 my-4">- O -</p>
+
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="productImage">Subir Imagen</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 file:border-none file:bg-transparent file:text-cyan-500 file:font-semibold" id="productImage" name="productImage" type="file" accept="image/*"/>
+                            <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, SVG</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors" type="submit">
+                            Cargar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+     <%- include('../partials/footer') %>
+</body>
+</html>

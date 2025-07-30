@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/tebteban/DPFS_esteban_cejas#readme",
   "dependencies": {
+    "ejs": "^3.1.10",
     "express": "^5.1.0"
   }
 }

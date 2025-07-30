@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Productos Destacados - Spikeshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Ajuste para que se muestren aproximadamente 4 productos, considerando el gap */
+        #carousel > div {
+            flex: 0 0 calc(25% - 24px); /* 25% para 4 items, -24px para compensar el gap-8 (32px / 4 = 8px * 3 gaps = 24px) */
+            min-width: 280px; /* Ancho mínimo para evitar que se hagan demasiado pequeños en pantallas chicas */
+        }
+
+        /* Opcional: Para pantallas más pequeñas, ajusta a 2 o 1 producto */
+        @media (max-width: 1024px) { /* Lg breakpoint en Tailwind */
+            #carousel > div {
+                flex: 0 0 calc(50% - 16px); /* 2 items en pantallas medianas */
+            }
+        }
+
+        @media (max-width: 768px) { /* Md breakpoint en Tailwind */
+            #carousel > div {
+                flex: 0 0 calc(100% - 8px); /* 1 item en pantallas pequeñas */
+            }
+        }
+    </style>
+</head>
+<body class="bg-cyan-50">
+    <div class="min-h-screen">
+        <%- include('../partials/header') %>
+
+        <main class="container mx-auto px-4 py-16 mt-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div>
+                    <p class="text-sm text-cyan-600 font-semibold tracking-widest">COMERCIO</p>
+                    <h1 class="text-4xl font-bold text-gray-800">PRODUCTOS DESTACADOS</h1>
+                    <p class="text-gray-600 mt-2">¡Descubre nuestras mejores selecciones para los amantes del voleibol!</p>
+                </div>
+            </div>
+
+            <div class="relative">
+                <div id="carousel" class="flex overflow-x-auto gap-8 scroll-smooth pb-4 no-scrollbar">
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/pelota" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Balón de voleibol oficial" class="max-h-full max-w-full object-contain" src="/img/pelota.jpg"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Balón oficial</h3>
+                        <p class="text-sm text-gray-500">Tamaño reglamentario</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$55</p>
+                         </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/zapatillas" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Zapatos de voleibol de alto rendimiento color coral" class="max-h-full max-w-full object-contain" src="/img/zapatillas.jpg"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Zapatillas de alto rendimiento</h3>
+                        <p class="text-sm text-gray-500">Varios colores disponibles</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$55</p>
+                        </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/rodillera" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Rodilleras de voleibol negras y blancas" class="max-h-full max-w-full object-contain" src="/img/rodillera.jpg"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Rodilleras profesionales</h3>
+                        <p class="text-sm text-gray-500">Todos los tamaños</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$55</p>
+                        </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/remera" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Camiseta técnica de la selección Argentina de voleibol" class="max-h-full max-w-full object-contain" src="/img/remera.jpg"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Remera de la selección Argentina</h3>
+                        <p class="text-sm text-gray-500">Diseño exclusivo</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$55</p>
+                        </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+                    
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/calza" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Calza Sonder" class="max-h-full max-w-full object-contain" src="/img/calza.png"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Calza Sonder</h3>
+                        <p class="text-sm text-gray-500">Talle L</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$40</p>
+                        </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+
+                    <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                        <a href="/productos/manga" class="block w-full h-90%">
+                        <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                            <img alt="Mangas deportivas para voley" class="max-h-full max-w-full object-contain" src="/img/manga.jpg"/>
+                        </div>
+                        <h3 class="mt-2 text-lg font-semibold text-gray-800">Manga Sonder</h3>
+                        <p class="text-sm text-gray-500">Talle 1</p>
+                        <p class="mt-3 text-xl font-bold text-cyan-700">$10</p>
+                        </a>
+                        <button class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors">Añadir al carrito</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-6 space-x-4">
+                <button onclick="scrollCarousel(-1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
+                    <span class="material-icons text-gray-600">arrow_back</span>
+                </button>
+                <button onclick="scrollCarousel(1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
+                    <span class="material-icons text-gray-600">arrow_forward</span>
+                </button>
+            </div>
+
+            </main>
+    </div>
+    <script>
+        function scrollCarousel(direction) {
+            const container = document.getElementById('carousel');
+            // Obtén el primer elemento del carrusel para calcular su ancho.
+            // Esto incluye el padding y el border del elemento, y necesitamos sumarle el gap.
+            // offsetWidth incluye padding y border, pero no el margin (gap en este caso).
+            const firstProduct = container.querySelector('.text-left.bg-white');
+            if (!firstProduct) return; // Asegurarse de que el producto existe
+
+            // Calcula el ancho total de un producto, incluyendo su margen derecho (gap).
+            // Tailwind CSS `gap-8` es 32px.
+            const productWidth = firstProduct.offsetWidth + 32;
+
+            container.scrollBy({
+                left: direction * productWidth, // Se mueve el ancho de un producto
+                behavior: 'smooth'
+            });
+        }
+    </script>
+     <%- include('../partials/footer') %>
+</body>
+</html>

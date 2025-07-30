@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>editar producto - Spikeshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Estilos adicionales para los inputs de tipo file (opcional, para una mejor visualización) */
+        input[type="file"]::file-selector-button {
+            background-color: #38bdf8; /* cian-500 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem; /* rounded-md */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-right: 1rem;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: #06b6d4; /* cian-600 */
+        }
+    </style>
+</head>
+<body class="bg-cyan-50">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-white shadow-sm">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="material-icons text-cyan-500">sports_volleyball</span>
+                        <span class="font-bold text-xl text-gray-800">SPIKESHOP</span>
+                    </div>
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="/">HOGAR</a>
+                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="/productos">PRODUCTOS</a>
+                        <a class="text-gray-600 hover:text-cyan-500 transition-colors" href="#">SOBRE NOSOTROS</a>
+                        <a class="flex items-center text-gray-600 hover:text-cyan-500 transition-colors" href="#">
+                            <span>CONTÁCTENOS</span>
+                            <span class="material-icons">expand_more</span>
+                        </a>
+                    </nav>
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a class="px-6 py-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition-colors inline-flex items-center justify-center" href="/register">Unirse</a>
+                        <a class="px-6 py-2 bg-cyan-500 text-white rounded-full hover:bg-cyan-600 transition-colors inline-flex items-center justify-center" href="/sign_in">Acceso</a>
+                        <a href="/cart" class="relative">
+                            <span class="material-icons text-gray-600 hover:text-cyan-500">shopping_cart</span>
+                        </a>
+                    </div>
+                    <button class="md:hidden">
+                        <span class="material-icons">menu</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow flex items-center justify-center p-4 py-8">
+            <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Editar Producto</h2>
+                
+                <form action="/editProduct/<%= product.id %>" method="POST" class="space-y-6">
+                    <input type="hidden" name="id" value="<%= product.id %>" />
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="productName">Nombre del Producto</label>
+                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="productName" name="productName" type="text" value="<%= product.productName %>" required/>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="description">Descripción</label>
+                        <textarea class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="description" name="description" rows="4" required><%= product.description %></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="price">Precio ($)</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="price" name="price" type="number" step="0.01" min="0" value="<%= product.price %>" required/>
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="stock">Stock</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="stock" name="stock" type="number" min="0" value="<%= product.stock %>" required/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="category">Categoría</label>
+                        <div class="relative">
+                            <select class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500" id="category" name="category" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="balones" <%= product.category === 'balones' ? 'selected' : '' %>>Balones</option>
+                                <option value="zapatillas" <%= product.category === 'zapatillas' ? 'selected' : '' %>>Zapatillas</option>
+                                <option value="indumentaria" <%= product.category === 'indumentaria' ? 'selected' : '' %>>Indumentaria</option>
+                                <option value="accesorios" <%= product.category === 'accesorios' ? 'selected' : '' %>>Accesorios</option>
+                            </select>
+                            <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">arrow_drop_down</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-sm font-medium text-gray-700 block mb-1" for="imageUrl">URL de la Imagen (o Subir Archivo)</label>
+                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="imageUrl" name="imageUrl" type="text" value="<%= product.imageUrl %>" placeholder="https://ejemplo.com/imagen.jpg o /img/tu_imagen.jpg"/>
+                        
+                        <p class="text-center text-sm text-gray-500 my-4">- O -</p>
+
+                        <div>
+                            <label class="text-sm font-medium text-gray-700 block mb-1" for="productImage">Subir Nueva Imagen</label>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 file:border-none file:bg-transparent file:text-cyan-500 file:font-semibold" id="productImage" name="productImage" type="file" accept="image/*"/>
+                            <p class="text-xs text-gray-500 mt-1">Dejar vacío para mantener la imagen actual. Formatos permitidos: JPG, PNG, SVG</p>
+                        </div>
+                        <% if (product.imageUrl) { %>
+                            <div class="mt-4 text-center">
+                                <p class="text-sm text-gray-600 mb-2">Imagen Actual:</p>
+                                <img src="<%= product.imageUrl %>" alt="Imagen actual del producto" class="max-w-[150px] max-h-[150px] object-contain mx-auto border border-gray-200 p-2 rounded-md shadow-sm"/>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div>
+                        <button class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors" type="submit">
+                            Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+     <%- include('../partials/footer') %>
+</body>
+</html>
