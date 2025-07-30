@@ -18,6 +18,36 @@ app.get('/productos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'productos.html'));
 });
 
+// Ruta para servir pelota.html
+app.get('/productos/pelota', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'pelota.html'));
+});
+
+// Ruta para servir zapatillas.html
+app.get('/productos/zapatillas', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'zapatillas.html'));
+});
+
+// Ruta para servir remera.html
+app.get('/productos/remera', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'remera.html'));
+});
+
+// Ruta para servir rodillera.html
+app.get('/productos/rodillera', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'rodillera.html'));
+});
+
+// Ruta para servir calza.html
+app.get('/productos/calza', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'calza.html'));
+});
+
+// Ruta para servir manga.html
+app.get('/productos/manga', (req, res) => {
+    res.sendFile(path.join(__dirname, 'productos', 'manga.html'));
+});
+
 // Ruta para servir sign_in.html(inicio de sesion)
 app.get('/sign_in', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'sign_in.html'));
