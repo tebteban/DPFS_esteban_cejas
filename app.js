@@ -1,5 +1,3 @@
-// app.js
-
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -15,7 +13,6 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Middleware para procesar datos de formularios (para POSTs de create/edit)
-// Asegúrate de que bodyParser (urlencoded y json) esté ANTES de Multer
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -26,13 +23,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadPath = path.join(__dirname, 'public', 'img');
-        // Asegúrate de que la carpeta exista. Si no, Multer la creará.
         fs.mkdirSync(uploadPath, { recursive: true });
         cb(null, uploadPath); // Directorio donde se guardarán las imágenes
     },
     filename: (req, file, cb) => {
         // Genera un nombre de archivo único para evitar colisiones
-        // Mantén la extensión original del archivo
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const fileExtension = path.extname(file.originalname); // Obtiene la extensión
         cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
@@ -99,28 +94,6 @@ app.get('/', (req, res) => {
     res.render('users/index');
 });
 
-app.get('/productos', (req, res) => {
-    const productsData = readProducts();
-    res.render('users/productos', { products: productsData });
-});
-
-app.get('/productos/:slug', (req, res) => {
-    const productSlug = req.params.slug;
-    const productsData = readProducts();
-    const product = productsData.find(p => p.slug === productSlug);
-
-    if (product) {
-        res.render('productos/productDetail', {
-            product,
-            pageTitle: product.name
-        });
-    } else {
-        res.status(404).render('users/error', {
-            message: 'Producto no encontrado.'
-        });
-    }
-});
-
 app.get('/sign_in', (req, res) => {
     const registrationSuccess = req.query.registrationSuccess === 'true';
     res.render('users/sign_in', { registrationSuccess });
@@ -179,7 +152,59 @@ app.get('/cart', (req, res) => {
     res.render('users/cart');
 });
 
-//Rutas de Gestión de Productos (Crear/Editar/Eliminar)
+// Rutas de Gestión de Productos (Listar, Buscar, Detalle, Crear, Editar, Eliminar)
+// Ruta para listar todos los productos
+app.get('/productos', (req, res) => {
+    const productsData = readProducts();
+    res.render('users/productos', { products: productsData, pageTitle: 'Todos los Productos' });
+});
+
+// Ruta para buscar un producto por su nombre
+app.get('/buscar-producto', (req, res) => {
+    const searchTerm = req.query.q; // Obtiene el término de búsqueda de la URL (?q=...)
+    const productsData = readProducts();
+
+    if (!searchTerm) {
+        // Si no hay término de búsqueda, redirige a la lista completa de productos
+        return res.redirect('/productos');
+    }
+
+    // Normalizar el término de búsqueda para comparación (quitar espacios, convertir a minúsculas)
+    const normalizedSearchTerm = searchTerm.toLowerCase().trim();
+
+    // Buscar el producto que coincida con el nombre (o parte del nombre)
+    const foundProduct = productsData.find(product =>
+        product.name.toLowerCase().includes(normalizedSearchTerm)
+    );
+
+    if (foundProduct) {
+        // Si se encuentra el producto, redirige a su página de detalle
+        res.redirect(`/productos/${foundProduct.slug}`);
+    } else {
+        // Si no se encuentra el producto, renderiza la página de error
+        res.status(404).render('users/error', {
+            message: `No se encontró ningún producto que coincida con "${searchTerm}". Por favor, inténtelo de nuevo.`
+        });
+    }
+});
+
+// Ruta para mostrar el detalle de un producto por su slug
+app.get('/productos/:slug', (req, res) => {
+    const productSlug = req.params.slug;
+    const productsData = readProducts();
+    const product = productsData.find(p => p.slug === productSlug);
+
+    if (product) {
+        res.render('productos/productDetail', {
+            product,
+            pageTitle: product.name
+        });
+    } else {
+        res.status(404).render('users/error', {
+            message: 'Producto no encontrado.'
+        });
+    }
+});
 
 // Ruta para servir createProduct (crear producto)
 app.get('/createProduct', (req, res) => {
@@ -189,9 +214,8 @@ app.get('/createProduct', (req, res) => {
 
 // Ruta POST para crear producto
 app.post('/createProduct', upload.single('productImage'), (req, res) => {
-    // 'productImage' debe coincidir con el 'name' del input type="file" en tu formulario
     const { productName, description, price, category, stock } = req.body;
-    const file = req.file; // Multer añade la información del archivo subido a req.file
+    const file = req.file;
 
     // Validación de campos
     let errorMessage = null;
@@ -258,8 +282,8 @@ app.get('/editProduct/:id', (req, res) => {
         // Si el producto existe, renderiza el formulario de edición con sus datos
         res.render('users/editProduct', {
             pageTitle: `Editar Producto: ${productToEdit.name}`,
-            product: productToEdit, // Pasa el objeto completo del producto
-            message: null // Inicializa el mensaje como nulo
+            product: productToEdit, 
+            message: null 
         });
     } else {
         // Si no se encuentra el producto, muestra un error 404
@@ -268,7 +292,6 @@ app.get('/editProduct/:id', (req, res) => {
 });
 
 // Ruta POST para actualizar un producto
-// Usamos upload.single('productImage') para permitir cambiar la imagen
 app.post('/editProduct/:id', upload.single('productImage'), (req, res) => {
     const productId = req.params.id;
     const productsData = readProducts();
@@ -280,9 +303,8 @@ app.post('/editProduct/:id', upload.single('productImage'), (req, res) => {
     }
 
     const { productName, description, price, stock, category } = req.body;
-    const file = req.file; // Archivo subido (si hay uno nuevo)
-    const oldProduct = productsData[productIndex]; // Datos del producto actual antes de la actualización
-
+    const file = req.file;
+    const oldProduct = productsData[productIndex]; 
     // Validaciones de campos
     let errorMessage = null;
     if (!productName || !description || !price || !category || stock === undefined || stock === '') {
@@ -310,13 +332,10 @@ app.post('/editProduct/:id', upload.single('productImage'), (req, res) => {
         });
     }
 
-    let newImageUrl = oldProduct.imageUrl; // Por defecto, mantiene la imagen actual
-
+    let newImageUrl = oldProduct.imageUrl; 
     // Si se subió un nuevo archivo, actualizar la imageUrl
     if (file) {
         newImageUrl = `/img/${file.filename}`;
-        // Opcional: Eliminar la imagen antigua si ya no se usa para liberar espacio
-        // ¡CUIDADO! Asegúrate de que `oldProduct.imageUrl` sea una ruta relativa y no una URL externa
         if (oldProduct.imageUrl && oldProduct.imageUrl.startsWith('/img/')) {
             const oldImagePath = path.join(__dirname, 'public', oldProduct.imageUrl);
             fs.unlink(oldImagePath, (err) => {
@@ -347,8 +366,7 @@ app.post('/editProduct/:id', upload.single('productImage'), (req, res) => {
     res.redirect('/productos');
 });
 
-// ** RUTA POST PARA ELIMINAR EL PRODUCTO **
-// Esta es la ruta que recibe la solicitud del modal de confirmación.
+// Ruta POST para eliminar un producto
 app.post('/deleteProduct/:id', (req, res) => {
     const productId = req.params.id;
     let productsData = readProducts(); // Usamos 'let' porque vamos a reasignar
@@ -362,8 +380,6 @@ app.post('/deleteProduct/:id', (req, res) => {
 
     const productToDelete = productsData[productIndex];
 
-    // Opcional: Eliminar el archivo de imagen del servidor
-    // Es una buena práctica para mantener tu carpeta 'public/img' limpia
     if (productToDelete.imageUrl && productToDelete.imageUrl.startsWith('/img/')) {
         const imagePath = path.join(__dirname, 'public', productToDelete.imageUrl);
         fs.unlink(imagePath, (err) => {
