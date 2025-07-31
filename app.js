@@ -1,5 +1,11 @@
+// app.js
+
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,155 +15,251 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Middleware para procesar datos de formularios (para POSTs de create/edit)
+// Asegúrate de que bodyParser (urlencoded y json) esté ANTES de Multer
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Sirve archivos estáticos desde la carpeta 'public'.
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- SIMULACIÓN DE BASE DE DATOS DE PRODUCTOS ---
-// Estos datos se usan para el pre-rellenado del formulario de edición.
-const productsData = [
-    {
-        id: 'pelota', // Usamos el slug como ID para este ejemplo
-        slug: 'pelota',
-        name: 'Balón oficial',
-        description: 'Balón de voleibol oficial FIVB, ideal para entrenamientos y partidos de alto rendimiento. Material sintético de alta calidad con excelente agarre y durabilidad.',
-        price: 55.00,
-        imageUrl: '/img/pelota.jpg',
-        category: 'balones', // Agregado para el formulario de edición
-        details: 'Tamaño reglamentario, peso oficial, apto para interior y exterior.'
+// --- Configuración de Multer para la subida de imágenes ---
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const uploadPath = path.join(__dirname, 'public', 'img');
+        // Asegúrate de que la carpeta exista. Si no, Multer la creará.
+        fs.mkdirSync(uploadPath, { recursive: true });
+        cb(null, uploadPath); // Directorio donde se guardarán las imágenes
     },
-    {
-        id: 'zapatillas',
-        slug: 'zapatillas',
-        name: 'Zapatillas de alto rendimiento',
-        description: 'Zapatillas de voleibol diseñadas para una máxima agilidad y soporte en la cancha. Ofrecen amortiguación superior y tracción multidireccional.',
-        price: 55.00,
-        imageUrl: '/img/zapatillas.jpg',
-        category: 'zapatillas',
-        details: 'Varios colores y tallas disponibles. Suela de goma antideslizante, transpirables.'
-    },
-    {
-        id: 'rodillera',
-        slug: 'rodillera',
-        name: 'Rodilleras profesionales',
-        description: 'Rodilleras de voleibol con acolchado de alta densidad para protección superior. Diseño ergonómico que permite total libertad de movimiento.',
-        price: 55.00,
-        imageUrl: '/img/rodillera.jpg',
-        category: 'accesorios',
-        details: 'Todos los tamaños. Tejido elástico y transpirable. Protección contra impactos.'
-    },
-    {
-        id: 'remera',
-        slug: 'remera',
-        name: 'Remera de la selección Argentina',
-        description: 'Camiseta técnica oficial de la selección Argentina de voleibol. Tejido ligero y transpirable para mantenerte fresco durante el juego.',
-        price: 55.00,
-        imageUrl: '/img/remera.jpg',
-        category: 'indumentaria',
-        details: 'Diseño exclusivo. Material de secado rápido. Disponible en tallas S, M, L, XL.'
-    },
-    {
-        id: 'calza',
-        slug: 'calza',
-        name: 'Calza Sonder',
-        description: 'Calza deportiva de voleibol marca Sonder. Ajuste cómodo y tejido elástico que permite un movimiento sin restricciones.',
-        price: 40.00,
-        imageUrl: '/img/calza.png',
-        category: 'indumentaria',
-        details: 'Talle L. Ideal para entrenamientos y partidos. Alta durabilidad.'
-    },
-    {
-        id: 'manga',
-        slug: 'manga',
-        name: 'Manga Sonder',
-        description: 'Mangas deportivas para voleibol marca Sonder. Proporcionan compresión y protección para los brazos durante el juego.',
-        price: 10.00,
-        imageUrl: '/img/manga.jpg',
-        category: 'accesorios',
-        details: 'Talle 1. Tejido transpirable. Ayuda a reducir la fatiga muscular.'
+    filename: (req, file, cb) => {
+        // Genera un nombre de archivo único para evitar colisiones
+        // Mantén la extensión original del archivo
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const fileExtension = path.extname(file.originalname); // Obtiene la extensión
+        cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
     }
-];
-// --- FIN SIMULACIÓN DE BASE DE DATOS ---
+});
 
+// Crea una instancia de Multer con la configuración de almacenamiento
+// 'productImage' es el nombre del campo del input file en tu formulario
+const upload = multer({ storage: storage });
+
+// --- Gestión de Datos de Productos (Archivo JSON) ---
+const productsPath = path.join(__dirname, 'data', 'products.json');
+
+function readProducts() {
+    try {
+        const jsonData = fs.readFileSync(productsPath, 'utf-8');
+        return JSON.parse(jsonData);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.warn('products.json no encontrado, inicializando con un array vacío.');
+            return [];
+        }
+        console.error('Error al leer o parsear products.json:', error);
+        return [];
+    }
+}
+
+function writeProducts(products) {
+    try {
+        fs.writeFileSync(productsPath, JSON.stringify(products, null, 2));
+    } catch (error) {
+        console.error('Error al escribir en products.json:', error);
+    }
+}
+
+// --- Gestión de Datos de Usuarios (Archivo JSON) ---
+const usersPath = path.join(__dirname, 'data', 'users.json');
+
+function readUsers() {
+    try {
+        const jsonData = fs.readFileSync(usersPath, 'utf-8');
+        return JSON.parse(jsonData);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            console.warn('users.json no encontrado, inicializando con un array vacío.');
+            return [];
+        }
+        console.error('Error al leer o parsear users.json:', error);
+        return [];
+    }
+}
+
+function writeUsers(users) {
+    try {
+        fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+    } catch (error) {
+        console.error('Error al escribir en users.json:', error);
+    }
+}
 
 // --- Rutas Generales ---
 
-// ruta para index (home)
 app.get('/', (req, res) => {
-    res.render('users/index'); 
+    res.render('users/index');
 });
 
-// ruta para productos (general)
 app.get('/productos', (req, res) => {
-    res.render('users/productos'); 
+    const productsData = readProducts();
+    res.render('users/productos', { products: productsData });
 });
 
-// ruta para iniciar sesión
+app.get('/productos/:slug', (req, res) => {
+    const productSlug = req.params.slug;
+    const productsData = readProducts();
+    const product = productsData.find(p => p.slug === productSlug);
+
+    if (product) {
+        res.render('productos/productDetail', {
+            product,
+            pageTitle: product.name
+        });
+    } else {
+        res.status(404).render('users/error', {
+            message: 'Producto no encontrado.'
+        });
+    }
+});
+
 app.get('/sign_in', (req, res) => {
-    res.render('users/sign_in');
+    const registrationSuccess = req.query.registrationSuccess === 'true';
+    res.render('users/sign_in', { registrationSuccess });
 });
 
-// ruta para registrarse
 app.get('/register', (req, res) => {
-    res.render('users/register'); 
+    res.render('users/register', { message: null });
 });
 
-// ruta para el carrito de compras
+app.post('/register', (req, res) => {
+    const { firstName, lastName, email, password, dob, gender } = req.body;
+    const usersData = readUsers();
+
+    let errorMessage = null;
+    if (!firstName || !lastName || !email || !password) {
+        errorMessage = 'Todos los campos obligatorios (Nombre, Apellido, Email, Contraseña) deben ser completados.';
+    } else if (!email.includes('@') || !email.includes('.')) {
+        errorMessage = 'Por favor, introduce un email válido.';
+    } else if (password.length < 8) {
+        errorMessage = 'La contraseña debe tener al menos 8 caracteres.';
+    } else if (usersData.some(user => user.email === email)) {
+        errorMessage = 'Este email ya está registrado. Por favor, inicia sesión o usa otro email.';
+    }
+
+    if (errorMessage) {
+        return res.status(400).render('users/register', { message: errorMessage });
+    }
+
+    const saltRounds = 10;
+    bcrypt.hash(password, saltRounds, (err, hashedPassword) => {
+        if (err) {
+            console.error('Error al hashear la contraseña:', err);
+            return res.status(500).render('users/register', { message: 'Error interno del servidor al procesar tu solicitud.' });
+        }
+
+        const newUser = {
+            id: uuidv4(),
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+            category: "cliente",
+            image: "/images/users/default.jpg",
+            dob: dob || null,
+            gender: gender || null
+        };
+
+        usersData.push(newUser);
+        writeUsers(usersData);
+
+        res.redirect('/sign_in?registrationSuccess=true');
+    });
+});
+
 app.get('/cart', (req, res) => {
-    res.render('users/cart'); 
+    res.render('users/cart');
 });
 
-// rutas de Detalle de Producto Individuales 
-app.get('/productos/pelota', (req, res) => {
-    res.render('productos/pelota'); //pelota
-});
-
-app.get('/productos/zapatillas', (req, res) => {
-    res.render('productos/zapatillas'); //zapatillas
-});
-
-app.get('/productos/remera', (req, res) => {
-    res.render('productos/remera'); //remera
-});
-
-app.get('/productos/rodillera', (req, res) => {
-    res.render('productos/rodillera'); //rodillera
-});
-
-app.get('/productos/calza', (req, res) => {
-    res.render('productos/calza'); //calza
-});
-
-app.get('/productos/manga', (req, res) => {
-    res.render('productos/manga'); //manga
-});
-
-// --- Rutas de Gestión de Productos (Crear/Editar) ---
+//Rutas de Gestión de Productos (Crear/Editar/Eliminar)
 
 // Ruta para servir createProduct (crear producto)
 app.get('/createProduct', (req, res) => {
-    res.render('users/createProduct', { pageTitle: 'Cargar Nuevo Producto' }); 
+    // Asegurarse de que pageTitle, message y oldData siempre se pasen, incluso si no hay error
+    res.render('users/createProduct', { pageTitle: 'Cargar Nuevo Producto', message: null, oldData: {} });
 });
 
-app.post('/createProduct', (req, res) => {
-    const { productName, description, price, stock, category, imageUrl } = req.body;
-    console.log('Producto recibido para crear:', { productName, description, price, stock, category, imageUrl });
-    res.redirect('/productos'); // Redirige a la página de productos (general)
+// Ruta POST para crear producto
+app.post('/createProduct', upload.single('productImage'), (req, res) => {
+    // 'productImage' debe coincidir con el 'name' del input type="file" en tu formulario
+    const { productName, description, price, category, stock } = req.body;
+    const file = req.file; // Multer añade la información del archivo subido a req.file
+
+    // Validación de campos
+    let errorMessage = null;
+    if (!productName || !description || !price || !category || stock === undefined || stock === '') {
+        errorMessage = 'Todos los campos obligatorios deben ser completados.';
+    } else if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+        errorMessage = 'El precio debe ser un número válido mayor que cero.';
+    } else if (isNaN(parseInt(stock)) || parseInt(stock) < 0) {
+        errorMessage = 'El stock debe ser un número entero válido y no negativo.';
+    } else if (!file) { // Para un nuevo producto, la imagen es obligatoria
+        errorMessage = 'Debe subir una imagen para el producto.';
+    }
+
+    if (errorMessage) {
+        // Si hay un error, renderiza el formulario de nuevo con el mensaje y los datos antiguos
+        return res.status(400).render('users/createProduct', {
+            pageTitle: 'Cargar Nuevo Producto',
+            message: errorMessage,
+            oldData: req.body // Pasa los datos que el usuario ya ingresó
+        });
+    }
+
+    const productsData = readProducts();
+
+    // Generar un ID único y un slug único para el producto
+    const newId = uuidv4();
+    let baseSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, '');
+    let productSlug = baseSlug;
+    let counter = 1;
+    while (productsData.some(p => p.slug === productSlug)) {
+        productSlug = `${baseSlug}-${counter}`;
+        counter++;
+    }
+
+    // La URL de la imagen será la ruta relativa desde 'public'
+    const imageUrl = `/img/${file.filename}`;
+
+    const newProduct = {
+        id: newId,
+        slug: productSlug,
+        name: productName,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        imageUrl: imageUrl,
+        category,
+        details: description // Asumimos que la descripción es el detalle inicial
+    };
+
+    productsData.push(newProduct);
+    writeProducts(productsData);
+
+    res.redirect('/productos'); // Redirige a la lista de productos
 });
 
-// Ruta para servir editproduct (editar producto) - DINÁMICA
+
+// Ruta GET para servir editProduct (editar producto)
 app.get('/editProduct/:id', (req, res) => {
     const productId = req.params.id;
-    // Busca el producto en tu array productsData por su 'id'
+    const productsData = readProducts();
     const productToEdit = productsData.find(p => p.id === productId);
 
     if (productToEdit) {
         // Si el producto existe, renderiza el formulario de edición con sus datos
-        res.render('users/editProduct', { 
+        res.render('users/editProduct', {
             pageTitle: `Editar Producto: ${productToEdit.name}`,
-            product: productToEdit 
+            product: productToEdit, // Pasa el objeto completo del producto
+            message: null // Inicializa el mensaje como nulo
         });
     } else {
         // Si no se encuentra el producto, muestra un error 404
@@ -165,30 +267,124 @@ app.get('/editProduct/:id', (req, res) => {
     }
 });
 
-app.post('/editProduct/:id', (req, res) => {
+// Ruta POST para actualizar un producto
+// Usamos upload.single('productImage') para permitir cambiar la imagen
+app.post('/editProduct/:id', upload.single('productImage'), (req, res) => {
     const productId = req.params.id;
-    const { productName, description, price, stock, category, imageUrl } = req.body;
+    const productsData = readProducts();
+    const productIndex = productsData.findIndex(p => p.id === productId);
 
-    // Aquí iría la lógica para ACTULIZAR el producto con 'productId' en tu 'productsData' o base de datos.
-    // Por ejemplo:
-    let productIndex = productsData.findIndex(p => p.id === productId);
-    if (productIndex !== -1) {
-        productsData[productIndex] = {
-            ...productsData[productIndex], // Mantén propiedades existentes que no se editan
-            name: productName,
-            description,
-            price: parseFloat(price),
-            stock: parseInt(stock),
-            category,
-            imageUrl
-        };
-        console.log(`Producto ${productId} actualizado:`, productsData[productIndex]);
-    } else {
-        console.log(`Producto ${productId} no encontrado para actualizar.`);
+    // Verificar si el producto existe
+    if (productIndex === -1) {
+        return res.status(404).render('users/error', { message: 'Producto no encontrado para actualizar.' });
     }
 
-    res.redirect('/productos'); // Redirige después de "actualizar"
+    const { productName, description, price, stock, category } = req.body;
+    const file = req.file; // Archivo subido (si hay uno nuevo)
+    const oldProduct = productsData[productIndex]; // Datos del producto actual antes de la actualización
+
+    // Validaciones de campos
+    let errorMessage = null;
+    if (!productName || !description || !price || !category || stock === undefined || stock === '') {
+        errorMessage = 'Todos los campos obligatorios deben ser completados.';
+    } else if (isNaN(parseFloat(price)) || parseFloat(price) <= 0) {
+        errorMessage = 'El precio debe ser un número válido y mayor que cero.';
+    } else if (isNaN(parseInt(stock)) || parseInt(stock) < 0) {
+        errorMessage = 'El stock debe ser un número entero válido y no negativo.';
+    }
+
+    if (errorMessage) {
+        // Si hay un error, renderiza de nuevo el formulario de edición con el mensaje
+        // y los datos enviados para que el usuario no los pierda.
+        return res.status(400).render('users/editProduct', {
+            pageTitle: `Editar Producto: ${oldProduct.name}`,
+            product: { // Reconstruir el objeto product con los datos enviados para que el formulario los retenga
+                ...oldProduct, // Mantiene id, slug, etc.
+                name: productName,
+                description,
+                price: parseFloat(price),
+                stock: parseInt(stock),
+                category
+            },
+            message: errorMessage
+        });
+    }
+
+    let newImageUrl = oldProduct.imageUrl; // Por defecto, mantiene la imagen actual
+
+    // Si se subió un nuevo archivo, actualizar la imageUrl
+    if (file) {
+        newImageUrl = `/img/${file.filename}`;
+        // Opcional: Eliminar la imagen antigua si ya no se usa para liberar espacio
+        // ¡CUIDADO! Asegúrate de que `oldProduct.imageUrl` sea una ruta relativa y no una URL externa
+        if (oldProduct.imageUrl && oldProduct.imageUrl.startsWith('/img/')) {
+            const oldImagePath = path.join(__dirname, 'public', oldProduct.imageUrl);
+            fs.unlink(oldImagePath, (err) => {
+                if (err) {
+                    console.error('Error al eliminar imagen antigua:', oldImagePath, err);
+                } else {
+                    console.log('Imagen antigua eliminada:', oldImagePath);
+                }
+            });
+        }
+    }
+
+    // Actualizar el producto en el array de productos
+    productsData[productIndex] = {
+        ...oldProduct, // Mantiene propiedades existentes como id, slug, etc.
+        name: productName,
+        description,
+        price: parseFloat(price),
+        stock: parseInt(stock),
+        category,
+        imageUrl: newImageUrl // Usa la nueva URL o la antigua
+    };
+
+    // Guardar los cambios en el archivo JSON
+    writeProducts(productsData);
+
+    // Redirigir a la lista de productos o al detalle del producto actualizado
+    res.redirect('/productos');
 });
+
+// ** RUTA POST PARA ELIMINAR EL PRODUCTO **
+// Esta es la ruta que recibe la solicitud del modal de confirmación.
+app.post('/deleteProduct/:id', (req, res) => {
+    const productId = req.params.id;
+    let productsData = readProducts(); // Usamos 'let' porque vamos a reasignar
+
+    const productIndex = productsData.findIndex(p => p.id === productId);
+
+    if (productIndex === -1) {
+        console.warn(`Intento de eliminar producto con ID ${productId} que no existe.`);
+        return res.status(404).render('users/error', { message: 'Producto no encontrado para eliminar.' });
+    }
+
+    const productToDelete = productsData[productIndex];
+
+    // Opcional: Eliminar el archivo de imagen del servidor
+    // Es una buena práctica para mantener tu carpeta 'public/img' limpia
+    if (productToDelete.imageUrl && productToDelete.imageUrl.startsWith('/img/')) {
+        const imagePath = path.join(__dirname, 'public', productToDelete.imageUrl);
+        fs.unlink(imagePath, (err) => {
+            if (err) {
+                console.error('Error al eliminar el archivo de imagen:', imagePath, err);
+            } else {
+                console.log('Archivo de imagen eliminado:', imagePath);
+            }
+        });
+    }
+
+    // Filtra el array para eliminar el producto
+    productsData = productsData.filter(p => p.id !== productId);
+
+    // Guarda el array actualizado de productos
+    writeProducts(productsData);
+
+    // Redirige a la lista de productos después de la eliminación exitosa
+    res.redirect('/productos');
+});
+
 
 // Inicia el servidor
 app.listen(PORT, () => {

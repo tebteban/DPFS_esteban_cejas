@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title><%= product.name %> - Spikeshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+
+        /* Estilos para el modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* Asegura que esté por encima de todo */
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px; /* Ancho fijo para el modal */
+            text-align: center;
+            position: relative; /* Necesario para posicionar el botón de cerrar */
+        }
+        .close-modal-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280; /* gray-500 */
+        }
+        .close-modal-btn:hover {
+            color: #374151; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-cyan-50">
+    <div class="min-h-screen">
+        <%- include('../partials/header') %>
+
+        <main class="container mx-auto px-4 py-16 mt-8">
+            <a href="/productos" class="flex items-center text-cyan-600 hover:text-cyan-800 transition-colors mb-8">
+                <span class="material-icons text-base mr-2">arrow_back</span>
+                Volver a productos
+            </a>
+
+            <div class="flex flex-col md:flex-row gap-8">
+                <div class="md:w-1/2 bg-gray-50 p-6 rounded-lg flex items-center justify-center">
+                    <img src="<%= product.imageUrl %>" alt="<%= product.name %>" class="max-h-96 object-contain"/>
+                </div>
+                <div class="md:w-1/2 bg-white p-6 rounded-lg shadow-md">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4"><%= product.name %></h1>
+                    <p class="text-gray-600 text-lg mb-6"><%= product.description %></p>
+
+                    <% if (product.category) { %>
+                        <p class="text-gray-700 mb-2">**Categoría:** <%= product.category %></p>
+                    <% } %>
+                    <% if (product.details) { %>
+                        <p class="text-gray-700 mb-2">**Características:** <%= product.details %></p>
+                    <% } %>
+                    <p class="mt-6 text-3xl font-bold text-cyan-700">$<%= product.price %></p>
+
+                    <button class="mt-6 w-full px-6 py-3 bg-cyan-600 text-white rounded-md hover:bg-cyan-700 transition-colors text-lg font-semibold">
+                        Añadir al carrito
+                    </button>
+                    <button class="mt-3 w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-lg">
+                        Comprar ahora
+                    </button>
+                    <a href="/editProduct/<%= product.id %>" class="mt-3 w-full inline-block text-center px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">
+                        Editar Producto
+                    </a>
+                    <button id="openDeleteModal" class="mt-3 w-full px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-lg font-semibold">
+                        Eliminar Producto
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-16">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Productos Relacionados</h2>
+                <div class="flex overflow-x-auto gap-8 pb-4">
+                    <div class="text-left bg-white p-4 rounded-lg shadow-md flex-shrink-0 w-64">
+                        <img alt="Zapatos de voleibol" class="h-40 w-full object-contain mb-2" src="/img/zapatillas.jpg"/>
+                        <h4 class="font-semibold text-gray-800">Zapatos de alto rendimiento</h4>
+                        <p class="text-sm text-gray-500">$55</p>
+                        <a href="/productos/zapatillas" class="block mt-2 text-center text-cyan-600 hover:underline">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <%- include('../partials/footer') %>
+
+    <div id="deleteConfirmationModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="close-modal-btn" id="closeModalBtn">&times;</button>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">¿Estás seguro que quieres eliminar este producto?</h3>
+            <p class="text-lg text-gray-700 mb-4 font-semibold"><%= product.name %></p>
+            <% if (product.imageUrl) { %>
+                <img src="<%= product.imageUrl %>" alt="<%= product.name %>" class="w-24 h-24 object-contain mx-auto rounded-md border border-gray-200 p-1 mb-4"/>
+            <% } %>
+            
+            <div class="flex justify-center space-x-4 mt-6">
+                <form action="/deleteProduct/<%= product.id %>" method="POST">
+                    <button type="submit" class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                        Sí, estoy seguro
+                    </button>
+                </form>
+                
+                <button type="button" id="cancelDeleteButton" class="px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openModalBtn = document.getElementById('openDeleteModal');
+            const modal = document.getElementById('deleteConfirmationModal');
+            const cancelBtn = document.getElementById('cancelDeleteButton');
+            const closeModalBtn = document.getElementById('closeModalBtn'); // Nuevo botón de cerrar
+
+            if (openModalBtn && modal && cancelBtn && closeModalBtn) {
+                openModalBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden'); // Muestra el modal
+                });
+
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden'); // Oculta el modal
+                });
+
+                closeModalBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden'); // Oculta el modal con el botón X
+                });
+
+                // Opcional: Cerrar modal haciendo clic fuera de la caja de contenido
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            } else {
+                console.error('Uno o más elementos del modal no se encontraron. Asegúrate de que los IDs sean correctos.');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "pelota",
+    "slug": "pelota",
+    "name": "Balón oficial",
+    "description": "Balón de voleibol oficial FIVB, ideal para entrenamientos y partidos de alto rendimiento. Material sintético de alta calidad con excelente agarre y durabilidad.",
+    "price": 55,
+    "imageUrl": "/img/pelota.jpg",
+    "category": "balones",
+    "details": "Tamaño reglamentario, peso oficial, apto para interior y exterior."
+  },
+  {
+    "id": "zapatillas",
+    "slug": "zapatillas",
+    "name": "Zapatillas de alto rendimiento",
+    "description": "Zapatillas de voleibol diseñadas para una máxima agilidad y soporte en la cancha. Ofrecen amortiguación superior y tracción multidireccional.",
+    "price": 55,
+    "imageUrl": "/img/zapatillas.jpg",
+    "category": "zapatillas",
+    "details": "Varios colores y tallas disponibles. Suela de goma antideslizante, transpirables."
+  },
+  {
+    "id": "rodillera",
+    "slug": "rodillera",
+    "name": "Rodilleras profesionales",
+    "description": "Rodilleras de voleibol con acolchado de alta densidad para protección superior. Diseño ergonómico que permite total libertad de movimiento.",
+    "price": 55,
+    "imageUrl": "/img/rodillera.jpg",
+    "category": "accesorios",
+    "details": "Todos los tamaños. Tejido elástico y transpirable. Protección contra impactos."
+  },
+  {
+    "id": "remera",
+    "slug": "remera",
+    "name": "Remera Seleccion Argentina",
+    "description": "Camiseta técnica oficial de la selección Argentina de voleibol. Tejido ligero y transpirable para mantenerte fresco durante el juego.",
+    "price": 55,
+    "imageUrl": "/img/remera.jpg",
+    "category": "indumentaria",
+    "details": "Diseño exclusivo. Material de secado rápido. Disponible en tallas S, M, L, XL."
+  },
+  {
+    "id": "calza",
+    "slug": "calza",
+    "name": "Calza Sonder",
+    "description": "Calza deportiva de voleibol marca Sonder. Ajuste cómodo y tejido elástico que permite un movimiento sin restricciones.",
+    "price": 40,
+    "imageUrl": "/img/calza.png",
+    "category": "indumentaria",
+    "details": "Talle L. Ideal para entrenamientos y partidos. Alta durabilidad."
+  },
+  {
+    "id": "manga",
+    "slug": "manga",
+    "name": "Manga Sonder",
+    "description": "Mangas deportivas para voleibol marca Sonder. Proporcionan compresión y protección para los brazos durante el juego.",
+    "price": 10,
+    "imageUrl": "/img/manga.jpg",
+    "category": "accesorios",
+    "details": "Talle 1. Tejido transpirable. Ayuda a reducir la fatiga muscular."
+  },
+  {
+    "id": "2361fb6a-b52d-4d0f-b233-cf80bcbd901c",
+    "slug": "red-de-voley",
+    "name": "red de voley",
+    "description": "Eleva tu juego al siguiente nivel con nuestra red de vóley estándar, diseñada para ofrecer durabilidad y rendimiento. Fabricada con materiales resistentes a la intemperie, es perfecta tanto para entrenamientos intensivos como para partidos recreativos en la playa o en el jardín. Su fácil instalación te permitirá armar tu cancha en minutos y disfrutar del vóley donde quieras.\"",
+    "price": 40,
+    "imageUrl": "/img/red.jpg",
+    "category": "accesorios",
+    "details": "Producto cargado desde el formulario."
+  },
+  {
+    "id": "52044b28-11f9-458c-9324-0e0295d3cc0f",
+    "slug": "aro-de-presicion",
+    "name": "Aro de Presicion",
+    "description": "Aro de Precision",
+    "price": 303,
+    "imageUrl": "/img/productImage-1753977519135-190044971.jpg",
+    "category": "accesorios",
+    "details": "Aro de Precisión para Entrenamiento de Vóley",
+    "stock": 3
+  }
+]

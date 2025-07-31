@@ -20,27 +20,35 @@
         <main class="flex-grow flex items-center justify-center p-4">
             <div class="bg-white rounded-lg p-8 max-w-4xl w-full shadow-lg">
                 <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Crear Cuenta</h2>
-                <form class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+                <% if (typeof message !== 'undefined' && message) { %>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">Error:</strong>
+                        <span class="block sm:inline"><%= message %></span>
+                    </div>
+                <% } %>
+
+                <form action="/register" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="full-name">Nombre Completo</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="full-name" type="text" placeholder="Ej: Juan Pérez"/>
+                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="full-name" type="text" placeholder="Ej: Juan Pérez" name="firstName" required/>
+                        </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700" for="last-name">Apellido</label>
+                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="last-name" type="text" placeholder="Ej: Pérez" name="lastName" required/>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="email">Email</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="email" type="email" placeholder="ejemplo@email.com"/>
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="username">Nombre de Usuario</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="username" type="text" placeholder="ej: JuanitoVoley"/>
+                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="email" type="email" placeholder="ejemplo@email.com" name="email" required/>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="password">Contraseña</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="password" type="password" placeholder="Mínimo 8 caracteres"/>
+                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="password" type="password" placeholder="Mínimo 8 caracteres" name="password" required/>
                     </div>
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="dob">Fecha de Nacimiento</label>
                         <div class="relative mt-1">
-                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="dob" placeholder="dd/mm/aaaa" type="text"/>
+                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500" id="dob" placeholder="dd/mm/aaaa" type="text" name="dob"/>
                             <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 calendar_today
                             </span>
@@ -49,33 +57,37 @@
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="gender">Género</label>
                         <div class="relative mt-1">
-                            <select class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500" id="gender">
-                                <option>Masculino</option>
-                                <option>Femenino</option>
-                                <option>Otro</option>
+                            <select class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500" id="gender" name="gender">
+                                <option value="">Selecciona tu género</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
                             </select>
                             <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 arrow_drop_down
                             </span>
                         </div>
                     </div>
+
                     <div class="col-span-1 md:col-span-2">
                         <button class="w-full mt-4 flex items-center justify-center p-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors border border-gray-300" type="button">
-                            <img alt="Google logo" class="h-5 w-5 mr-3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRrjvURDLZjn4LV-Yln34z9WkprAwiMaDQID_0IcxArZe-_pu2Q0VKcmPg6Tv0t-RtEGC7chwftZZy8-eE8VDvvXMpKFxyJKGH5yqbyCb8quyPpxv2m4LRA8emmK-P-wqCAyLTH0bjjY6vGzKAg1IP8iChspdV_SPqVPLFdRaCxGPNC1ykqvQh3UozofoFtxqKwyboNt8-z0_Z4eUuZ8GvT9T12mnxodMcY3thiLlP5fl8iULBulwnXmBSZZAc3mFiM9ROOyLkJtk"/>
+                            <img alt="Google logo" class="h-5 w-5 mr-3" src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google_G_Suite.png"/>
                             Registrarse con Google
                         </button>
                     </div>
                     <div class="col-span-1 md:col-span-2">
                         <button class="w-full flex items-center justify-center p-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors border border-gray-300" type="button">
-                            <img alt="Apple logo" class="h-6 w-6 mr-3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7CEDVpZqFbTieZyuClAxtZFw6bUI-jE-MFbfkabyja1VCyPbOIfylRgcifSAF6YtWgxXz9Pk3K5gkRXAtNDpJnt7ik-S5s_FZhDtaggbcvGEFlM-iIdyBruEw799EaFfheYOYLK4tKraJ9QAj2GaOLIvrgkfPtKdtG5lCUBzppoYDWN1D8OUD24wNKVAwviOP001DRmwpooS908COkYk05C5v6w_hr3qlHwtu0TyquZk77Bf2CrVw2J-jPmweBnsu9p-LnHsWeTI"/>
+                            <img alt="Apple logo" class="h-6 w-6 mr-3" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"/>
                             Registrarse con Apple
                         </button>
                     </div>
+
                     <div class="col-span-1 md:col-span-2">
                         <button class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors" type="submit">
                             Registrarse
                         </button>
                     </div>
+
                     <div class="col-span-1 md:col-span-2 text-center mt-4">
                         <div class="flex items-center">
                             <hr class="w-full border-gray-300"/>
@@ -87,6 +99,6 @@
             </div>
         </main>
     </div>
-     <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>
 </body>
 </html>
