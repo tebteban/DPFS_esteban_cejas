@@ -18,19 +18,37 @@ Esto hizo que todo sea mucho más cómodo y eficiente.
 
 ## 🛒 Funcionalidades implementadas
 
-- ✅ **Carrito de compras** funcionando
-- 🔍 **Barra de búsqueda** activa
-- 👤 **Registro de usuarios** guardado en `users.json`
-- 📤 **Subida de productos** guardada en `products.json` y visible en la página de productos
-- 🗑️ **Eliminación de productos** funcionando correctamente
+- ✅ **Carrito de compras** funcionando  
+- 🔍 **Barra de búsqueda** activa  
+- 👤 **Registro de usuarios** guardado en `users.json`  
+- 📤 **Subida de productos** guardada en `products.json` y visible en la página de productos  
+- 🗑️ **Eliminación de productos** funcionando correctamente  
 - ✏️ **Edición de productos** funcionando al 100% (99% seguro 😅)
 
 ---
 
 ## 📁 Archivos utilizados
 
-- `users.json` → para guardar usuarios registrados
-- `products.json` → para guardar productos subidos
+- `users.json` → para guardar usuarios registrados  
+- `products.json` → para guardar productos subidos  
+
+---
+
+## 🧩 Implementación del patrón MVC
+
+Para mejorar la estructura del proyecto y facilitar la escalabilidad, implementé el patrón **Modelo-Vista-Controlador (MVC)**:
+
+- 📂 **routes/**  
+  - `mainRoutes.js`  
+  - `productsRoutes.js`  
+  - `usersRoutes.js`
+
+- 📂 **controllers/**  
+  - `mainController.js`  
+  - `productsController.js`  
+  - `usersController.js`
+
+Además, modifiqué `app.js` para que integre correctamente las rutas y controladores, manteniendo todo más modular y ordenado.
 
 ---
 
