@@ -17,11 +17,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+            background-color: rgba(0, 0, 0, 0.5); 
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000; /* Asegura que esté por encima de todo */
+            z-index: 1000;
         }
         .modal-content {
             background-color: white;
@@ -31,7 +31,7 @@
             max-width: 90%;
             width: 400px; /* Ancho fijo para el modal */
             text-align: center;
-            position: relative; /* Necesario para posicionar el botón de cerrar */
+            position: relative;
         }
         .close-modal-btn {
             position: absolute;
@@ -41,10 +41,10 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #6b7280; /* gray-500 */
+            color: #6b7280;
         }
         .close-modal-btn:hover {
-            color: #374151; /* gray-700 */
+            color: #374151;
         }
     </style>
 </head>
@@ -80,7 +80,8 @@
                     <button class="mt-3 w-full px-6 py-3 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-lg">
                         Comprar ahora
                     </button>
-                    <a href="/editProduct/<%= product.id %>" class="mt-3 w-full inline-block text-center px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">
+
+                    <a href="/productos/editProduct/<%= product.id %>" class="mt-3 w-full inline-block text-center px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">
                         Editar Producto
                     </a>
                     <button id="openDeleteModal" class="mt-3 w-full px-6 py-3 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors text-lg font-semibold">
@@ -114,7 +115,7 @@
             <% } %>
             
             <div class="flex justify-center space-x-4 mt-6">
-                <form action="/deleteProduct/<%= product.id %>" method="POST">
+                <form action="/productos/deleteProduct/<%= product.id %>" method="POST">
                     <button type="submit" class="px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors">
                         Sí, estoy seguro
                     </button>

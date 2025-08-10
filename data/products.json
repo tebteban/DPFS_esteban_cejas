@@ -68,16 +68,5 @@
     "imageUrl": "/img/red.jpg",
     "category": "accesorios",
     "details": "Producto cargado desde el formulario."
-  },
-  {
-    "id": "52044b28-11f9-458c-9324-0e0295d3cc0f",
-    "slug": "aro-de-presicion",
-    "name": "Aro de Presicion",
-    "description": "Aro de Precision",
-    "price": 303,
-    "imageUrl": "/img/productImage-1753977519135-190044971.jpg",
-    "category": "accesorios",
-    "details": "Aro de Precisión para Entrenamiento de Vóley",
-    "stock": 3
   }
 ]
