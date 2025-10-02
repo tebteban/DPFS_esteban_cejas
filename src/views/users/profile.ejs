@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Iniciar Sesión - Spikeshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-cyan-50">
+    <div class="min-h-screen flex flex-col">
+
+<%- include('../partials/header') %> 
+
+<main class="flex-grow flex items-center justify-center p-4 bg-gray-100">
+    <div class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-2xl my-10">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-2 leading-tight">
+                ¡Bienvenido/a, <span class="text-cyan-600"><%= user.firstName %></span>!
+            </h2>
+            <p class="text-lg text-gray-500">Este es tu perfil privado. Tu sesión ha sido iniciada correctamente.</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-8 border-t pt-8">
+            
+            <!-- Imagen de Perfil -->
+            <div class="flex-shrink-0">
+                <img class="h-36 w-36 object-cover rounded-full border-4 border-cyan-500 shadow-xl" 
+                     src="<%= user.image %>" 
+                     alt="Avatar de <%= user.firstName %>"
+                     onerror="this.onerror=null;this.src='/img/users/default.jpg';"
+                >
+            </div>
+
+            <!-- Detalles del Usuario -->
+            <div class="text-left w-full space-y-4">
+                <h3 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-3">Información de Cuenta</h3>
+                
+                <div class="grid grid-cols-1 gap-3">
+                    <p class="text-gray-700">
+                        <span class="font-bold block text-sm text-gray-500">Nombre Completo:</span>
+                        <span class="text-gray-800"><%= user.firstName %> <%= user.lastName %></span>
+                    </p>
+                    <p class="text-gray-700">
+                        <span class="font-bold block text-sm text-gray-500">Email:</span>
+                        <span class="text-gray-800"><%= user.email %></span>
+                    </p>
+                    <p class="text-gray-700">
+                        <span class="font-bold block text-sm text-gray-500">Categoría:</span>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize"><%= user.category %></span>
+                    </p>
+                    <p class="text-gray-700">
+                        <span class="font-bold block text-sm text-gray-500">ID de Usuario:</span>
+                        <code class="bg-gray-200 px-2 py-1 rounded text-xs text-gray-700"><%= user.id %></code>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botón de Logout -->
+        <div class="mt-10 pt-6 border-t">
+            <a href="/users/logout"
+               class="inline-flex items-center justify-center w-full py-3 px-6 border border-transparent rounded-lg shadow-lg text-lg font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-150 ease-in-out"
+            >
+                Cerrar Sesión (Logout)
+            </a>
+        </div>
+    </div>
+</main>
+
+    </div>
+     <%- include('../partials/footer') %>
+</body>
+</html>

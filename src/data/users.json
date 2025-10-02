@@ -1,0 +1,158 @@
+[
+  {
+    "id": 1,
+    "firstName": "María",
+    "lastName": "Gómez",
+    "email": "maria.gomez@email.com",
+    "password": "hashedPassword123",
+    "category": "cliente",
+    "image": "/images/users/1.jpg"
+  },
+  {
+    "id": 2,
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "email": "juan.perez@email.com",
+    "password": "hashedPassword456",
+    "category": "administrador",
+    "image": "/images/users/2.jpg"
+  },
+  {
+    "id": 3,
+    "firstName": "Ana",
+    "lastName": "Rodríguez",
+    "email": "ana.rodriguez@email.com",
+    "password": "hashedPassword789",
+    "category": "cliente",
+    "image": "/images/users/3.jpg"
+  },
+  {
+    "id": 4,
+    "firstName": "Pedro",
+    "lastName": "Martínez",
+    "email": "pedro.martinez@email.com",
+    "password": "hashedPasswordABC",
+    "category": "vendedor",
+    "image": "/images/users/4.jpg"
+  },
+  {
+    "id": 5,
+    "firstName": "Sofía",
+    "lastName": "Hernández",
+    "email": "sofia.hernandez@email.com",
+    "password": "hashedPasswordDEF",
+    "category": "cliente",
+    "image": "/images/users/5.jpg"
+  },
+  {
+    "id": 6,
+    "firstName": "Luis",
+    "lastName": "Díaz",
+    "email": "luis.diaz@email.com",
+    "password": "hashedPasswordGHI",
+    "category": "cliente",
+    "image": "/images/users/6.jpg"
+  },
+  {
+    "id": 7,
+    "firstName": "Laura",
+    "lastName": "Sánchez",
+    "email": "laura.sanchez@email.com",
+    "password": "hashedPasswordJKL",
+    "category": "administrador",
+    "image": "/images/users/7.jpg"
+  },
+  {
+    "id": 8,
+    "firstName": "Carlos",
+    "lastName": "Ramírez",
+    "email": "carlos.ramirez@email.com",
+    "password": "hashedPasswordMNO",
+    "category": "vendedor",
+    "image": "/images/users/8.jpg"
+  },
+  {
+    "id": 9,
+    "firstName": "Elena",
+    "lastName": "Flores",
+    "email": "elena.flores@email.com",
+    "password": "hashedPasswordPQR",
+    "category": "cliente",
+    "image": "/images/users/9.jpg"
+  },
+  {
+    "id": 10,
+    "firstName": "Diego",
+    "lastName": "Vázquez",
+    "email": "diego.vazquez@email.com",
+    "password": "hashedPasswordSTU",
+    "category": "cliente",
+    "image": "/images/users/10.jpg"
+  },
+  {
+    "id": "fcd940bb-34fa-460f-ad9e-6ff017e0b3ce",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "tebancejas@gmail.com",
+    "password": "$2b$10$buEjGWNhhaaAcUM8cbs8gOmv9JxFwPseBuOE7DjpgM5E6sRDKMGNa",
+    "category": "cliente",
+    "image": "/images/users/default.jpg",
+    "dob": "18/06/2005",
+    "gender": "masculino"
+  },
+  {
+    "id": "cd484ef4-ad13-442f-905a-fac836a47bc1",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "maxirohrmann@outlook.com.ar",
+    "password": "$2b$10$PIprQGdnOTKxa6EzgZBqMOuLdHh0I7TQB00iK3BT.tRTP6J7Qm2d6",
+    "category": "cliente",
+    "image": "/img/1759419269968.jpg",
+    "dob": "2005-06-18",
+    "gender": "masculino"
+  },
+  {
+    "id": "46790305-6eb8-4f4c-b35d-765fea43700c",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "ecvvv@hotmail.com",
+    "password": "$2b$10$dvaKPmNwTWD3R7cIWpbLWuMEndseuUG3V7e7Kc.5QqEw4RZ1Z4nWm",
+    "category": "cliente",
+    "image": "/img/1759420291068.jpg",
+    "dob": "2002-02-15",
+    "gender": "femenino"
+  },
+  {
+    "id": "f6712eb2-f6f7-4a6a-ac28-c890d96cb7da",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "tebcejas@gmail.com",
+    "password": "$2b$10$4XiGHuabmYSCKfg9zEWmT.PevZFv.T/KXUP1UzbUhl5FqOdMK1ctO",
+    "category": "cliente",
+    "image": "/img/1759420512283.jpg",
+    "dob": "2025-10-16",
+    "gender": "masculino"
+  },
+  {
+    "id": "7d7dcfe1-2919-49e8-ac48-22021a592c37",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "ecvavv@hotmail.com",
+    "password": "$2b$10$QCCWK1Mp.EJph/NdjWIAH.KT8NGCvS8zVGMJlEjhJ6OLhByH76ytq",
+    "category": "cliente",
+    "image": "/img/1759421945360.png",
+    "dob": null,
+    "gender": "masculino"
+  },
+  {
+    "id": "355f536c-f2d7-40f2-ae06-f328d92fc214",
+    "firstName": "Esteban",
+    "lastName": "Cejas",
+    "email": "estebancejas11@gmail.com",
+    "password": "$2b$10$/iV.b/I/RNIbnKO/qwwWLuNhhGkQTUxsbkFSkozy3999rNvb6EoMi",
+    "category": "cliente",
+    "image": "/img/1759423719751.png",
+    "dob": "2004-03-05",
+    "gender": "masculino"
+  }
+]
