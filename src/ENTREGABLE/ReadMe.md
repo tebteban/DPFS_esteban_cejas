@@ -180,7 +180,7 @@ if (req.session.userLogged.role !== 'admin') {
 ## 🧠 Autor
 
 **Desarrollado por:**  
-👤 *Celeste Torres – Spikeshop Project*  
+👤 *Esteban Cejas – Spikeshop Project*  
 🎓 Curso: *Desarrollo Fullstack (Sprint 6 – Base de Datos con Sequelize)*  
 🏫 Universidad Católica de Santiago del Estero  
 
