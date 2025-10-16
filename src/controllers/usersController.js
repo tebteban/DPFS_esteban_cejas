@@ -1,110 +1,138 @@
-const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
-// Asegúrate de que esta ruta sea correcta y que readUsers/writeUsers existan
-const { readUsers, writeUsers } = require('../data/models'); 
+const { User } = require('../../models'); // importamos el modelo Sequelize
 
 const usersController = {
-    // Mostrar formulario de registro (GET /users/register)
-    register: (req, res) => {
-        res.render('users/register');
-    },
 
-    // Guardar usuario (POST /users/register)
-    store: (req, res) => {
-        const { firstName, lastName, email, password } = req.body; // Campos simplificados para el ejemplo
-        const usersData = readUsers();
+  // 🧾 Mostrar formulario de registro
+  register: (req, res) => {
+    res.render('users/register');
+  },
 
-        // Validación básica
-        if (usersData.some(user => user.email === email)) {
-            return res.status(400).render('users/register', { message: 'Este email ya está registrado.', oldData: req.body });
-        }
+  // 💾 Guardar usuario (POST /users/register)
+  store: async (req, res) => {
+    const { firstName, lastName, email, password } = req.body;
 
-        bcrypt.hash(password, 10, (err, hashedPassword) => {
-            if (err) {
-                return res.status(500).render('users/register', { message: 'Error del servidor.' });
-            }
+    try {
+      // 1️⃣ Verificar si el email ya existe
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        return res.status(400).render('users/register', { 
+          message: 'Este email ya está registrado.', 
+          oldData: req.body 
+        });
+      }
 
-            const newUser = {
-                id: uuidv4(),
-                firstName,
-                lastName,
-                email,
-                password: hashedPassword,
-                category: "cliente",
-                image: req.file ? `/img/users/${req.file.filename}` : "/img/users/default.jpg",
-            };
+      // 2️⃣ Hashear contraseña
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-            usersData.push(newUser);
-            writeUsers(usersData);
+      // 3️⃣ Crear usuario
+      await User.create({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        role: 'customer',
+        image: req.file ? `/img/users/${req.file.filename}` : '/img/users/default.jpg'
+      });
 
-            res.redirect('/users/login?registrationSuccess=true'); 
-        });
-    },
+      // 4️⃣ Redirigir al login con mensaje
+      res.redirect('/users/login?registrationSuccess=true');
+    } catch (error) {
+      console.error('Error al registrar usuario:', error);
+      res.status(500).render('users/register', { 
+        message: 'Error del servidor. Intenta nuevamente.', 
+        oldData: req.body 
+      });
+    }
+  },
 
-    // Mostrar formulario login (GET /users/login)
-    login: (req, res) => {
-        res.render('users/login', { query: req.query }); 
-    },
+  // 🧠 Mostrar formulario de login
+  login: (req, res) => {
+    res.render('users/login', { query: req.query });
+  },
 
-    // Procesar login (POST /users/login)
-    loginProcess: (req, res) => {
-        const { email, password, remember } = req.body; // <-- Captura 'remember'
-        const usersData = readUsers();
-        
-        // 1. Buscar usuario
-        const user = usersData.find(u => u.email === email);
+  // 🔑 Procesar login (POST /users/login)
+  loginProcess: async (req, res) => {
+    const { email, password, remember } = req.body;
 
-        if (!user) {
-            // Mensaje genérico por seguridad
-            return res.render('users/login', { message: 'Credenciales inválidas.', query: req.query });
-        }
+    try {
+      // 1️⃣ Buscar usuario
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.render('users/login', { 
+          message: 'Credenciales inválidas.', 
+          query: req.query 
+        });
+      }
 
-        // 2. Comparar contraseña
-        if (!bcrypt.compareSync(password, user.password)) {
-            // Mensaje genérico por seguridad
-            return res.render('users/login', { message: 'Credenciales inválidas.', query: req.query });
-        }
+      // 2️⃣ Comparar contraseñas
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        return res.render('users/login', { 
+          message: 'Credenciales inválidas.', 
+          query: req.query 
+        });
+      }
 
-        // 3. Autenticación exitosa: Crear objeto de sesión (solo datos necesarios)
-        const userToSession = { 
-            id: user.id, 
-            firstName: user.firstName, 
-            lastName: user.lastName,
-            email: user.email, 
-            image: user.image,
-            category: user.category // Necesario para el header si lo usas
-        };
-        req.session.userLogged = userToSession; // <-- Nombre de la sesión consistente
+      // 3️⃣ Crear sesión
+      const userToSession = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        image: user.image,
+        role: user.role
+      };
+      req.session.userLogged = userToSession;
 
-        // 4. (Opcional) Configurar cookie de "Recuérdame"
-        if (remember) {
-            // La cookie 'rememberUser' se guarda con el ID del usuario
-            res.cookie('rememberUser', user.id, { 
-                maxAge: 1000 * 60 * 60 * 24 * 90, // 90 días
-                httpOnly: true 
-            }); 
-        }
-        
-        // 5. Redireccionar al perfil
-        res.redirect('/users/profile'); 
-    },
+      // 4️⃣ Recordarme (cookie)
+      if (remember) {
+        res.cookie('rememberUser', user.id, {
+          maxAge: 1000 * 60 * 60 * 24 * 90, // 90 días
+          httpOnly: true
+        });
+      }
 
-    // Perfil (GET /users/profile)
-    profile: (req, res) => {
-        // La variable 'user' ya está disponible globalmente, pero se pasa de forma explícita por claridad
-        res.render('users/profile', { user: req.session.userLogged });
-    },
+      // 5️⃣ Redirigir al perfil
+      res.redirect('/users/profile');
+    } catch (error) {
+      console.error('Error en login:', error);
+      res.status(500).render('users/login', { 
+        message: 'Error del servidor.', 
+        query: req.query 
+      });
+    }
+  },
 
-    // Logout (GET /users/logout)
-    logout: (req, res) => {
-        // Borrar cookie 'rememberUser' del navegador
-        res.clearCookie('rememberUser'); 
+  // 👤 Perfil de usuario
+ // Perfil (GET /users/profile)
+profile: async (req, res) => {
+  try {
+    // Buscar el usuario más reciente desde la base de datos
+    const freshUser = await User.findByPk(req.session.userLogged.id);
 
-        // Destruir sesión en el servidor
-        req.session.destroy(() => {
-            res.redirect('/');
-        });
-    }
+    // Si existe, actualizamos los datos de sesión (por si el rol o la imagen cambiaron)
+    if (freshUser) {
+      req.session.userLogged.role = freshUser.role;
+      req.session.userLogged.image = freshUser.image;
+      req.session.userLogged.firstName = freshUser.firstName;
+      req.session.userLogged.lastName = freshUser.lastName;
+    }
+
+    // Renderizar el perfil con los datos actualizados
+    res.render('users/profile', { user: req.session.userLogged });
+  } catch (error) {
+    console.error('Error al actualizar sesión del usuario:', error);
+    res.status(500).render('users/error', { message: 'Error al cargar el perfil.' });
+  }
+},
+
+
+  // 🚪 Logout
+  logout: (req, res) => {
+    res.clearCookie('rememberUser');
+    req.session.destroy(() => res.redirect('/'));
+  }
 };
 
 module.exports = usersController;

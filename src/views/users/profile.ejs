@@ -52,8 +52,9 @@
                         <span class="text-gray-800"><%= user.email %></span>
                     </p>
                     <p class="text-gray-700">
-                        <span class="font-bold block text-sm text-gray-500">Categoría:</span>
-                        <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize"><%= user.category %></span>
+                        <span class="font-bold block text-sm text-gray-500">Rol:</span>
+                        <span class="bg-cyan-100 text-cyan-800 text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                        <%= user.role === 'admin' ? 'Administrador' : 'Cliente' %></span>
                     </p>
                     <p class="text-gray-700">
                         <span class="font-bold block text-sm text-gray-500">ID de Usuario:</span>
