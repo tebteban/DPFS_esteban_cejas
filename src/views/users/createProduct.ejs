@@ -1,108 +1,119 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>subir productos - Spikeshop</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        /* Estilos adicionales para los inputs de tipo file (opcional, para una mejor visualización) */
-        /* Ya tienes esto, solo lo mantengo para referencia */
-        input[type="file"]::file-selector-button {
-            background-color: #38bdf8; /* cian-500 */
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem; /* rounded-md */
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-right: 1rem;
-        }
-        input[type="file"]::file-selector-button:hover {
-            background-color: #06b6d4; /* cian-600 */
-        }
-    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cargar Producto - Spikeshop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    input[type="file"]::file-selector-button {
+      background-color: #38bdf8;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-right: 1rem;
+    }
+    input[type="file"]::file-selector-button:hover { background-color: #06b6d4; }
+  </style>
 </head>
 <body class="bg-cyan-50">
-    <div class="min-h-screen flex flex-col">
-        <%- include('../partials/header') %>
+  <div class="min-h-screen flex flex-col">
+    <%- include('../partials/header') %>
 
-        <main class="flex-grow flex items-center justify-center p-4 py-8">
-            <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Cargar Nuevo Producto</h2>
+    <main class="flex-grow flex items-center justify-center p-4 py-8">
+      <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Cargar Nuevo Producto</h2>
 
-                <% if (typeof message !== 'undefined' && message) { %>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong class="font-bold">Error:</strong>
-                        <span class="block sm:inline"><%= message %></span>
-                    </div>
-                <% } %>
-                
-                <form action="/createProduct" method="POST" enctype="multipart/form-data" class="space-y-6">
-                    <div>
-                        <label class="text-sm font-medium text-gray-700 block mb-1" for="productName">Nombre del Producto</label>
-                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                               id="productName" name="productName" type="text" placeholder="Balón Oficial de Voleibol" required
-                               value="<%= typeof oldData !== 'undefined' ? oldData.productName : '' %>"/>
-                    </div>
+        <% if (message) { %>
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <strong class="font-bold">Error:</strong>
+            <span><%= message %></span>
+          </div>
+        <% } %>
 
-                    <div>
-                        <label class="text-sm font-medium text-gray-700 block mb-1" for="description">Descripción</label>
-                        <textarea class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                  id="description" name="description" rows="4" placeholder="Descripción detallada del producto..." required><%= typeof oldData !== 'undefined' ? oldData.description : '' %></textarea>
-                    </div>
+        <form action="/productos/createProduct" method="POST" enctype="multipart/form-data" class="space-y-6">
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="text-sm font-medium text-gray-700 block mb-1" for="price">Precio ($)</label>
-                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                   id="price" name="price" type="number" step="0.01" min="0" placeholder="Ej: 55.99" required
-                                   value="<%= typeof oldData !== 'undefined' ? oldData.price : '' %>"/>
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-700 block mb-1" for="stock">Stock</label>
-                            <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                   id="stock" name="stock" type="number" min="0" placeholder="Ej: 100" required
-                                   value="<%= typeof oldData !== 'undefined' ? oldData.stock : '' %>"/>
-                        </div>
-                    </div>
+          <!-- Nombre -->
+          <div>
+            <label for="productName" class="text-sm font-medium text-gray-700 block mb-1">Nombre del Producto</label>
+            <input id="productName" name="productName" type="text" placeholder="Ej: Balón Mikasa V200W" required
+              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
+              value="<%= oldData.productName || '' %>">
+          </div>
 
-                    <div>
-                        <label class="text-sm font-medium text-gray-700 block mb-1" for="category">Categoría</label>
-                        <div class="relative">
-                            <select class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                                    id="category" name="category" required>
-                                <option value="" <%= (typeof oldData === 'undefined' || oldData.category === '') ? 'selected' : '' %>>Selecciona una categoría</option>
-                                <option value="balones" <%= (typeof oldData !== 'undefined' && oldData.category === 'balones') ? 'selected' : '' %>>Balones</option>
-                                <option value="zapatillas" <%= (typeof oldData !== 'undefined' && oldData.category === 'zapatillas') ? 'selected' : '' %>>Zapatillas</option>
-                                <option value="indumentaria" <%= (typeof oldData !== 'undefined' && oldData.category === 'indumentaria') ? 'selected' : '' %>>Indumentaria</option>
-                                <option value="accesorios" <%= (typeof oldData !== 'undefined' && oldData.category === 'accesorios') ? 'selected' : '' %>>Accesorios</option>
-                            </select>
-                            <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">arrow_drop_down</span>
-                        </div>
-                    </div>
+          <!-- Descripción -->
+          <div>
+            <label for="description" class="text-sm font-medium text-gray-700 block mb-1">Descripción</label>
+            <textarea id="description" name="description" rows="4" placeholder="Descripción detallada del producto..." required
+              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"><%= oldData.description || '' %></textarea>
+          </div>
 
-                    <div>
-                        <label class="text-sm font-medium text-gray-700 block mb-1" for="productImage">Subir Imagen del Producto</label>
-                        <input class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 file:border-none file:bg-transparent file:text-cyan-500 file:font-semibold"
-                               id="productImage" name="productImage" type="file" accept="image/*" required/>
-                        <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, SVG. Esta imagen será la principal del producto.</p>
-                    </div>
-
-                    <div>
-                        <button class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors" type="submit">
-                            Cargar Producto
-                        </button>
-                    </div>
-                </form>
+          <!-- Precio y Stock -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="price" class="text-sm font-medium text-gray-700 block mb-1">Precio ($)</label>
+              <input id="price" name="price" type="number" step="0.01" min="0" placeholder="Ej: 14999" required
+                class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
+                value="<%= oldData.price || '' %>">
             </div>
-        </main>
-    </div>
-     <%- include('../partials/footer') %>
+            <div>
+              <label for="stock" class="text-sm font-medium text-gray-700 block mb-1">Stock</label>
+              <input id="stock" name="stock" type="number" min="0" placeholder="Ej: 25" required
+                class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
+                value="<%= oldData.stock || '' %>">
+            </div>
+          </div>
+
+          <!-- Categoría -->
+          <div>
+            <label for="category_id" class="text-sm font-medium text-gray-700 block mb-1">Categoría</label>
+            <select id="category_id" name="category_id" required
+              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat.id %>" <%= oldData.category_id == cat.id ? 'selected' : '' %>>
+                  <%= cat.name %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <!-- Marca -->
+          <div>
+            <label for="brand_id" class="text-sm font-medium text-gray-700 block mb-1">Marca</label>
+            <select id="brand_id" name="brand_id" required
+              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
+              <option value="" disabled selected>Selecciona una marca</option>
+              <% brands.forEach(br => { %>
+                <option value="<%= br.id %>" <%= oldData.brand_id == br.id ? 'selected' : '' %>>
+                  <%= br.name %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+
+          <!-- Imagen -->
+          <div>
+            <label for="productImage" class="text-sm font-medium text-gray-700 block mb-1">Subir Imagen</label>
+            <input id="productImage" name="productImage" type="file" accept="image/*" required
+              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
+            <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, SVG.</p>
+          </div>
+
+          <button type="submit" class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors">
+            Cargar Producto
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <%- include('../partials/footer') %>
 </body>
 </html>

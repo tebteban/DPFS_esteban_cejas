@@ -1,175 +1,253 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Productos - Spikeshop</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        /* Ajuste para que se muestren aproximadamente 4 productos, considerando el gap */
-        #carousel > div {
-            flex: 0 0 calc(25% - 24px); /* 25% para 4 items, -24px para compensar el gap-8 (32px / 4 = 8px * 3 gaps = 24px) */
-            min-width: 280px; /* Ancho mínimo para evitar que se hagan demasiado pequeños en pantallas chicas */
-        }
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Productos - Spikeshop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
 
-        /* Opcional: Para pantallas más pequeñas, ajusta a 2 o 1 producto */
-        @media (max-width: 1024px) { /* Lg breakpoint en Tailwind */
-            #carousel > div {
-                flex: 0 0 calc(50% - 16px); /* 2 items en pantallas medianas */
-            }
-        }
+    #carousel > div {
+      flex: 0 0 calc(25% - 24px);
+      min-width: 280px;
+    }
 
-        @media (max-width: 768px) { /* Md breakpoint en Tailwind */
-            #carousel > div {
-                flex: 0 0 calc(100% - 8px); /* 1 item en pantallas pequeñas */
-            }
-        }
-        /* Ocultar la barra de desplazamiento */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
-    </style>
+    @media (max-width: 1024px) {
+      #carousel > div {
+        flex: 0 0 calc(50% - 16px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      #carousel > div {
+        flex: 0 0 calc(100% - 8px);
+      }
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
+
 <body class="bg-cyan-50">
-    <div class="min-h-screen">
-        <%- include('../partials/header') %>
+  <div class="min-h-screen">
+    <%- include('../partials/header') %>
 
-        <main class="container mx-auto px-4 py-16 mt-8">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                    <p class="text-sm text-cyan-600 font-semibold tracking-widest">COMERCIO</p>
-                    <h1 class="text-4xl font-bold text-gray-800">PRODUCTOS DESTACADOS</h1>
-                    <p class="text-gray-600 mt-2">¡Descubre nuestras mejores selecciones para los amantes del voleibol!</p>
-                </div>
-            </div>
+    <main class="container mx-auto px-4 py-16 mt-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+          <p class="text-sm text-cyan-600 font-semibold tracking-widest">COMERCIO</p>
+          <h1 class="text-4xl font-bold text-gray-800">PRODUCTOS DESTACADOS</h1>
+          <p class="text-gray-600 mt-2">
+            ¡Descubre nuestras mejores selecciones para los amantes del voleibol!
+          </p>
+        </div>
+      </div>
 
-            <div class="mb-10 flex justify-center">
-                <form action="/buscar-producto" method="GET" class="flex w-full max-w-lg">
-                    <input
-                        type="text"
-                        name="q"
-                        placeholder="Buscar producto por nombre..."
-                        class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                        required
+      <!-- BUSCADOR CON RESULTADOS EN VIVO -->
+      <div class="mb-10 flex flex-col items-center relative">
+        <form id="liveSearchForm" action="/productos/buscar-producto" method="GET" class="flex w-full max-w-lg">
+          <input
+            type="text"
+            id="searchInput"
+            name="q"
+            placeholder="Buscar producto por nombre..."
+            class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            autocomplete="off"
+          />
+          <button
+            type="submit"
+            class="px-6 py-2 bg-cyan-600 text-white rounded-r-md hover:bg-cyan-700 transition-colors flex items-center justify-center"
+          >
+            <span class="material-icons mr-2">search</span>
+            Buscar
+          </button>
+        </form>
+
+        <!-- 🔍 Contenedor de sugerencias -->
+        <ul id="searchSuggestions"
+            class="absolute top-14 w-full max-w-lg bg-white border border-gray-300 rounded-lg shadow-md z-10 hidden">
+        </ul>
+      </div>
+
+      <!-- CARRUSEL DE PRODUCTOS -->
+      <div class="relative">
+        <div id="carousel" class="flex overflow-x-auto gap-8 scroll-smooth pb-4 no-scrollbar">
+          <% if (products && products.length > 0) { %>
+            <% products.forEach(product => { %>
+              <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <a href="/productos/<%= product.id %>" class="block w-full">
+                  <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
+                    <img
+                      src="<%= product.image && product.image.startsWith('/img/') ? product.image : '/img/products/' + (product.image || 'default.jpg') %>"
+                      alt="<%= product.name %>"
+                      class="max-h-full max-w-full object-contain"
+                      onerror="this.src='/img/products/default.jpg'"
                     />
-                    <button
-                        type="submit"
-                        class="px-6 py-2 bg-cyan-600 text-white rounded-r-md hover:bg-cyan-700 transition-colors flex items-center justify-center"
-                    >
-                        <span class="material-icons mr-2">search</span>
-                        Buscar
-                    </button>
-                </form>
-            </div>
-            <div class="relative">
-                <div id="carousel" class="flex overflow-x-auto gap-8 scroll-smooth pb-4 no-scrollbar">
-                    <% if (products && products.length > 0) { %>
-                        <% products.forEach(product => { %>
-                            <div class="text-left bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                                <a href="/productos/<%= product.slug %>" class="block w-full">
-                                    <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-center h-64 mb-4">
-                                        <img alt="<%= product.name %>" class="max-h-full max-w-full object-contain" src="<%= product.imageUrl %>"/>
-                                    </div>
-                                    <h3 class="mt-2 text-lg font-semibold text-gray-800"><%= product.name %></h3>
-                                    <p class="text-sm text-gray-500"><%= product.details || product.description %></p>
-                                    <p class="mt-3 text-xl font-bold text-cyan-700">$<%= product.price.toFixed(2) %></p>
-                                </a>
-                                <button
-                                    class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors add-to-cart-btn"
-                                    data-product-id="<%= product.id %>"
-                                    data-product-name="<%= product.name %>"
-                                    data-product-price="<%= product.price %>"
-                                    data-product-image="<%= product.imageUrl %>"
-                                >
-                                    Añadir al carrito
-                                </button>
-                            </div>
-                        <% }); %>
-                    <% } else { %>
-                        <div class="w-full text-center py-10">
-                            <p class="text-gray-600 text-lg">No hay productos disponibles para mostrar en este momento.</p>
-                            <p class="text-gray-500 mt-2">¡Sé el primero en <a href="/createProduct" class="text-cyan-600 hover:underline">añadir un producto</a>!</p>
-                        </div>
-                    <% } %>
-                </div>
-            </div>
-
-            <div class="flex justify-center mt-6 space-x-4">
-                <button onclick="scrollCarousel(-1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <span class="material-icons text-gray-600">arrow_back</span>
-                </button>
-                <button onclick="scrollCarousel(1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
-                    <span class="material-icons text-gray-600">arrow_forward</span>
-                </button>
-            </div>
-
-            <div class="text-center mt-12">
-                <a href="/productos/createProduct" class="inline-block px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">
-                    Cargar Nuevo Producto
+                  </div>
+                  <h3 class="mt-2 text-lg font-semibold text-gray-800"><%= product.name %></h3>
+                  <p class="text-sm text-gray-500"><%= product.details || product.description %></p>
+                  <p class="mt-3 text-xl font-bold text-cyan-700">$<%= Number(product.price).toFixed(2) %></p>
                 </a>
+
+                <!-- BOTÓN AÑADIR AL CARRITO -->
+                <button
+                  class="mt-4 w-full px-4 py-2 bg-cyan-500 text-white rounded-md hover:bg-cyan-600 transition-colors add-to-cart-btn"
+                  data-product-id="<%= product.id %>"
+                  data-product-name="<%= product.name %>"
+                  data-product-price="<%= product.price %>"
+                  data-product-image="<%= product.image && product.image.startsWith('/img/') ? product.image : '/img/products/' + (product.image || 'default.jpg') %>"
+                >
+                  Añadir al carrito
+                </button>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="w-full text-center py-10">
+              <p class="text-gray-600 text-lg">No hay productos disponibles para mostrar en este momento.</p>
+              <p class="text-gray-500 mt-2">
+                ¡Sé el primero en <a href="/productos/createProduct" class="text-cyan-600 hover:underline">añadir un producto</a>!
+              </p>
             </div>
+          <% } %>
+        </div>
+      </div>
 
-        </main>
-    </div>
-    <script>
-        function scrollCarousel(direction) {
-            const container = document.getElementById('carousel');
-            const firstProduct = container.querySelector('.text-left.bg-white');
-            if (!firstProduct) return;
+      <!-- BOTONES DE NAVEGACIÓN -->
+      <div class="flex justify-center mt-6 space-x-4">
+        <button onclick="scrollCarousel(-1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
+          <span class="material-icons text-gray-600">arrow_back</span>
+        </button>
+        <button onclick="scrollCarousel(1)" class="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-100">
+          <span class="material-icons text-gray-600">arrow_forward</span>
+        </button>
+      </div>
 
-            const productWidth = firstProduct.offsetWidth + 32; // Suma el gap-8 (32px)
+      <div class="text-center mt-12">
+        <a href="/productos/createProduct" class="inline-block px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-lg font-semibold">
+          Cargar Nuevo Producto
+        </a>
+      </div>
+    </main>
+  </div>
 
-            container.scrollBy({
-                left: direction * productWidth,
-                behavior: 'smooth'
-            });
+  <!-- SCRIPT -->
+  <script>
+    // --- BUSCADOR EN VIVO (AJAX) ---
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("searchInput");
+      const suggestionsList = document.getElementById("searchSuggestions");
+      const searchForm = document.getElementById("liveSearchForm");
+
+      if (!searchInput || !suggestionsList) return;
+
+      let timeout = null;
+
+      searchInput.addEventListener("input", () => {
+        clearTimeout(timeout);
+        const query = searchInput.value.trim();
+
+        if (query.length < 2) {
+          suggestionsList.classList.add("hidden");
+          suggestionsList.innerHTML = "";
+          return;
         }
 
-        // --- Lógica del Carrito (JavaScript) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+        timeout = setTimeout(async () => {
+          try {
+            const response = await fetch(`/api/products?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
 
-            addToCartButtons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const productId = event.target.dataset.productId;
-                    const productName = event.target.dataset.productName;
-                    const productPrice = parseFloat(event.target.dataset.productPrice);
-                    const productImage = event.target.dataset.productImage;
+            if (!data || !data.products || data.products.length === 0) {
+              suggestionsList.innerHTML = `<li class="p-3 text-gray-500 text-center">Sin resultados para "${query}"</li>`;
+              suggestionsList.classList.remove("hidden");
+              return;
+            }
 
-                    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            suggestionsList.innerHTML = data.products.map(
+              (p) => `
+                <li class="p-3 hover:bg-cyan-50 cursor-pointer border-b border-gray-200"
+                    onclick="window.location.href='/productos/${p.id}'">
+                  <div class="flex items-center space-x-3">
+                    <img src="${p.image}" alt="${p.name}" class="w-10 h-10 object-contain rounded-md border">
+                    <div>
+                      <p class="font-semibold text-gray-800">${p.name}</p>
+                      <p class="text-sm text-cyan-700">$${Number(p.price).toFixed(2)}</p>
+                    </div>
+                  </div>
+                </li>`
+            ).join("");
 
-                    const existingItemIndex = cart.findIndex(item => item.id === productId);
+            suggestionsList.classList.remove("hidden");
+          } catch (error) {
+            console.error("Error en la búsqueda en vivo:", error);
+          }
+        }, 300);
+      });
 
-                    if (existingItemIndex > -1) {
-                        // Si el producto ya está en el carrito, incrementa la cantidad
-                        cart[existingItemIndex].quantity += 1;
-                    } else {
-                        // Si es un producto nuevo, añádelo al carrito
-                        cart.push({
-                            id: productId,
-                            name: productName,
-                            price: productPrice,
-                            image: productImage,
-                            quantity: 1
-                        });
-                    }
+      document.addEventListener("click", (e) => {
+        if (!searchForm.contains(e.target)) {
+          suggestionsList.classList.add("hidden");
+        }
+      });
+    });
 
-                    localStorage.setItem('cart', JSON.stringify(cart));
-                    alert(`${productName} ha sido añadido al carrito.`);
-                    // Opcional: Actualizar un contador de carrito en el header si existe
-                });
+    // --- SCROLL DE CARRUSEL ---
+    function scrollCarousel(direction) {
+      const container = document.getElementById("carousel");
+      const firstProduct = container.querySelector(".text-left.bg-white");
+      if (!firstProduct) return;
+      const productWidth = firstProduct.offsetWidth + 32;
+      container.scrollBy({
+        left: direction * productWidth,
+        behavior: "smooth",
+      });
+    }
+
+    // --- LÓGICA DEL CARRITO ---
+    document.addEventListener("DOMContentLoaded", () => {
+      const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+
+      addToCartButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+          const productId = event.target.dataset.productId;
+          const productName = event.target.dataset.productName;
+          const productPrice = parseFloat(event.target.dataset.productPrice);
+          const productImage = event.target.dataset.productImage;
+
+          let cart = JSON.parse(localStorage.getItem("cart")) || [];
+          const existingItemIndex = cart.findIndex((item) => item.id === productId);
+
+          if (existingItemIndex > -1) {
+            cart[existingItemIndex].quantity += 1;
+          } else {
+            cart.push({
+              id: productId,
+              name: productName,
+              price: productPrice,
+              image: productImage,
+              quantity: 1,
             });
+          }
+
+          localStorage.setItem("cart", JSON.stringify(cart));
+          alert(`${productName} ha sido añadido al carrito.`);
         });
-    </script>
-    <%- include('../partials/footer') %>
+      });
+    });
+  </script>
+
+  <%- include('../partials/footer') %>
 </body>
 </html>
