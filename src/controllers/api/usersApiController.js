@@ -1,5 +1,5 @@
 const { User } = require('../../../models');
-const baseUrl = 'http://localhost:3000';
+const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 module.exports = {
   // GET /api/users
@@ -10,7 +10,7 @@ module.exports = {
         count: users.length,
         users: users.map(u => ({
           id: u.id,
-          name: `${u.firstName || u.first_name} ${u.lastName || u.last_name}`,
+          name: [u.firstName, u.lastName].filter(Boolean).join(' ').trim(), 
           email: u.email,
           detail: `${baseUrl}/api/users/${u.id}`
         }))
@@ -28,8 +28,8 @@ module.exports = {
 
       res.json({
         id: user.id,
-        first_name: user.firstName || user.first_name,
-        last_name: user.lastName || user.last_name,
+        first_name: user.firstName,
+        last_name: user.lastName,
         email: user.email,
         role: user.role,
         image_url: `${baseUrl}${user.image}`

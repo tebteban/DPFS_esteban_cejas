@@ -1,3 +1,5 @@
+require('./src/utils/loadEnv')();
+
 const express = require('express');
 const path = require('path');
 const multer = require('multer');
@@ -8,8 +10,12 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
 const rememberMiddleware = require('./src/middlewares/rememberMiddleware');
+
 const app = express();
+const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 3000;
+const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
+const SESSION_SECRET = process.env.SESSION_SECRET || 'change-me';
 
 // Configuración de EJS y la carpeta 'views'
 app.set('view engine', 'ejs');
@@ -23,9 +29,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // --- Configuración de sesiones y cookies ---
 app.use(cookieParser());
 app.use(session({
-  secret: 'un-secreto-bien-dificil',
+  secret: SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 2 // 2 horas
+  }
 }));
 
 // ✅ NUEVAS RUTAS API
@@ -43,8 +55,8 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Servidor local de desarrollo'
+        url: APP_BASE_URL,
+        description: 'Servidor configurado'
       }
     ]
   },

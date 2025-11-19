@@ -21,10 +21,14 @@
             <div class="bg-white rounded-lg p-8 max-w-4xl w-full shadow-lg">
                 <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Crear Cuenta</h2>
 
-                <% if (typeof message !== 'undefined' && message) { %>
+                <% if (errors && errors.length) { %>
                     <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong class="font-bold">Error:</strong>
-                        <span class="block sm:inline"><%= message %></span>
+                        <strong class="font-bold block mb-1">Revisa los siguientes puntos:</strong>
+                        <ul class="list-disc ml-5 text-sm space-y-1">
+                            <% errors.forEach(error => { %>
+                                <li><%= error.msg %></li>
+                            <% }) %>
+                        </ul>
                     </div>
                 <% } %>
 
@@ -34,22 +38,22 @@
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="full-name">Nombre</label>
                         <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="full-name" type="text" placeholder="Ej: Juan" 
-                               name="firstName" required/>
+                               id="full-name" type="text" placeholder="Ej: Juan"
+                               name="firstName" value="<%= (oldData && oldData.firstName) || '' %>" required/>
                     </div>
 
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="last-name">Apellido</label>
                         <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="last-name" type="text" placeholder="Ej: Pérez" 
-                               name="lastName" required/>
+                               id="last-name" type="text" placeholder="Ej: Pérez"
+                               name="lastName" value="<%= (oldData && oldData.lastName) || '' %>" required/>
                     </div>
 
                     <div>
                         <label class="text-sm font-medium text-gray-700" for="email">Email</label>
                         <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="email" type="email" placeholder="ejemplo@email.com" 
-                               name="email" required/>
+                               id="last-name" type="text" placeholder="Ej: Pérez"
+                               name="lastName" value="<%= (oldData && oldData.lastName) || '' %>" required/>
                     </div>
 
                     <div>

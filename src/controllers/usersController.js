@@ -1,81 +1,91 @@
 const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 const { User } = require('../../models'); // importamos el modelo Sequelize
 
 const usersController = {
 
   // 🧾 Mostrar formulario de registro
   register: (req, res) => {
-    res.render('users/register');
-  },
+    res.render('users/register', { errors: [], oldData: {} });
+    },
 
   // 💾 Guardar usuario (POST /users/register)
   store: async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+    const errors = validationResult(req);
+    const oldData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email
+    };
+
+    if (!errors.isEmpty()) {
+      return res.status(400).render('users/register', {
+        errors: errors.array(),
+        oldData
+      });
+    }
 
     try {
-      // 1️⃣ Verificar si el email ya existe
-      const existingUser = await User.findOne({ where: { email } });
-      if (existingUser) {
-        return res.status(400).render('users/register', { 
-          message: 'Este email ya está registrado.', 
-          oldData: req.body 
-        });
-      }
-
-      // 2️⃣ Hashear contraseña
-      const hashedPassword = await bcrypt.hash(password, 10);
-
-      // 3️⃣ Crear usuario
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      
       await User.create({
-        firstName,
-        lastName,
-        email,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
         password: hashedPassword,
         role: 'customer',
         image: req.file ? `/img/users/${req.file.filename}` : '/img/users/default.jpg'
       });
 
-      // 4️⃣ Redirigir al login con mensaje
+
       res.redirect('/users/login?registrationSuccess=true');
     } catch (error) {
       console.error('Error al registrar usuario:', error);
-      res.status(500).render('users/register', { 
-        message: 'Error del servidor. Intenta nuevamente.', 
-        oldData: req.body 
+      res.status(500).render('users/register', {
+        errors: [{ msg: 'Error del servidor. Intenta nuevamente.' }],
+        oldData
       });
     }
   },
 
   // 🧠 Mostrar formulario de login
   login: (req, res) => {
-    res.render('users/login', { query: req.query });
-  },
+    res.render('users/login', { query: req.query, errors: [], oldData: {} });
+    },
 
   // 🔑 Procesar login (POST /users/login)
   loginProcess: async (req, res) => {
-    const { email, password, remember } = req.body;
+    const errors = validationResult(req);
+    const oldData = { email: req.body.email };
+
+    if (!errors.isEmpty()) {
+      return res.status(400).render('users/login', {
+        errors: errors.array(),
+        oldData,
+        query: req.query
+      });
+    }
 
     try {
-      // 1️⃣ Buscar usuario
-      const user = await User.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email: req.body.email } });
       if (!user) {
-        return res.render('users/login', { 
-          message: 'Credenciales inválidas.', 
-          query: req.query 
+        return res.status(400).render('users/login', {
+          errors: [{ msg: 'Credenciales inválidas.' }],
+          oldData,
+          query: req.query
         });
       }
 
-      // 2️⃣ Comparar contraseñas
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      const passwordMatch = await bcrypt.compare(req.body.password, user.password);
       if (!passwordMatch) {
-        return res.render('users/login', { 
-          message: 'Credenciales inválidas.', 
-          query: req.query 
+        return res.status(400).render('users/login', {
+          errors: [{ msg: 'Credenciales inválidas.' }],
+          oldData,
+          query: req.query
         });
       }
 
-      // 3️⃣ Crear sesión
-      const userToSession = {
+      req.session.userLogged = {
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -83,13 +93,13 @@ const usersController = {
         image: user.image,
         role: user.role
       };
-      req.session.userLogged = userToSession;
 
-      // 4️⃣ Recordarme (cookie)
-      if (remember) {
+      if (req.body.remember === 'on') {
         res.cookie('rememberUser', user.id, {
-          maxAge: 1000 * 60 * 60 * 24 * 90, // 90 días
-          httpOnly: true
+          maxAge: 1000 * 60 * 60 * 24 * 90,
+          httpOnly: true,
+          sameSite: 'lax',
+          secure: (process.env.NODE_ENV || 'development') === 'production'
         });
       }
 
@@ -97,35 +107,40 @@ const usersController = {
       res.redirect('/users/profile');
     } catch (error) {
       console.error('Error en login:', error);
-      res.status(500).render('users/login', { 
-        message: 'Error del servidor.', 
+      res.status(500).render('users/login', {
+        errors: [{ msg: 'Error del servidor.' }],
+        oldData,
         query: req.query 
       });
     }
   },
 
   // 👤 Perfil de usuario
- // Perfil (GET /users/profile)
-profile: async (req, res) => {
-  try {
-    // Buscar el usuario más reciente desde la base de datos
-    const freshUser = await User.findByPk(req.session.userLogged.id);
-
-    // Si existe, actualizamos los datos de sesión (por si el rol o la imagen cambiaron)
-    if (freshUser) {
-      req.session.userLogged.role = freshUser.role;
-      req.session.userLogged.image = freshUser.image;
-      req.session.userLogged.firstName = freshUser.firstName;
-      req.session.userLogged.lastName = freshUser.lastName;
+   profile: async (req, res) => {
+    if (!req.session.userLogged) {
+      return res.redirect('/users/login');
     }
 
-    // Renderizar el perfil con los datos actualizados
-    res.render('users/profile', { user: req.session.userLogged });
-  } catch (error) {
-    console.error('Error al actualizar sesión del usuario:', error);
-    res.status(500).render('users/error', { message: 'Error al cargar el perfil.' });
-  }
-},
+    try {
+      const freshUser = await User.findByPk(req.session.userLogged.id);
+
+      if (freshUser) {
+        req.session.userLogged = {
+          id: freshUser.id,
+          firstName: freshUser.firstName,
+          lastName: freshUser.lastName,
+          email: freshUser.email,
+          image: freshUser.image,
+          role: freshUser.role
+        };
+      }
+
+      res.render('users/profile', { user: req.session.userLogged });
+    } catch (error) {
+      console.error('Error al actualizar sesión del usuario:', error);
+      res.status(500).render('users/error', { message: 'Error al cargar el perfil.' });
+    }
+  },
 
 
   // 🚪 Logout

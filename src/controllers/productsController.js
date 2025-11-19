@@ -1,6 +1,16 @@
 const path = require('path');
 const fs = require('fs');
+const { validationResult } = require('express-validator');
 const { Product, Category, Brand } = require('../../models');
+
+const fetchFormData = async () => {
+  const [categories, brands] = await Promise.all([
+    Category.findAll(),
+    Brand.findAll()
+  ]);
+  return { categories, brands };
+};
+
 
 const productsController = {
 
@@ -63,13 +73,13 @@ const productsController = {
   // ➕ Formulario crear producto
   getCreateProduct: async (req, res) => {
     try {
-      const categories = await Category.findAll();
-      const brands = await Brand.findAll();
+      const { categories, brands } = await fetchFormData();
       res.render('users/createProduct', {
         pageTitle: 'Cargar Nuevo Producto',
-        message: null,
+        errors: [],
         oldData: {},
         categories,
+        message: null,
         brands
       });
     } catch (error) {
@@ -80,26 +90,13 @@ const productsController = {
 
   // 🧩 Crear producto
   postCreateProduct: async (req, res) => {
-    const { productName, description, price, stock, category_id, brand_id } = req.body;
-    const file = req.file;
+      const errors = validationResult(req);
 
-    let errorMessage = null;
-    if (!productName || !description || !price || !category_id || !brand_id || stock === '') {
-      errorMessage = 'Todos los campos obligatorios deben ser completados.';
-    } else if (isNaN(price) || price <= 0) {
-      errorMessage = 'El precio debe ser un número válido mayor que cero.';
-    } else if (isNaN(stock) || stock < 0) {
-      errorMessage = 'El stock debe ser un número válido y no negativo.';
-    } else if (!file) {
-      errorMessage = 'Debe subir una imagen para el producto.';
-    }
-
-    if (errorMessage) {
-      const categories = await Category.findAll();
-      const brands = await Brand.findAll();
+      if (!errors.isEmpty()) {
+      const { categories, brands } = await fetchFormData();
       return res.status(400).render('users/createProduct', {
         pageTitle: 'Cargar Nuevo Producto',
-        message: errorMessage,
+        errors: errors.array(),
         oldData: req.body,
         categories,
         brands
@@ -107,15 +104,15 @@ const productsController = {
     }
 
     try {
-      const imageUrl = `/img/products/${file.filename}`;
+      const imageUrl = `/img/products/${req.file.filename}`;
       await Product.create({
-        name: productName,
-        description,
-        price: parseFloat(price),
-        stock: parseInt(stock),
+        name: req.body.productName,
+        description: req.body.description,
+        price: parseFloat(req.body.price),
+        stock: parseInt(req.body.stock, 10),
         image: imageUrl,
-        category_id: parseInt(category_id),
-        brand_id: parseInt(brand_id),
+        category_id: parseInt(req.body.category_id, 10),
+        brand_id: parseInt(req.body.brand_id, 10),
         user_id: req.session.userLogged ? req.session.userLogged.id : null
       });
       res.redirect('/productos');
@@ -129,9 +126,8 @@ const productsController = {
   getEditProduct: async (req, res) => {
     try {
       const product = await Product.findByPk(req.params.id);
-      const categories = await Category.findAll();
-      const brands = await Brand.findAll();
-
+      const { categories, brands } = await fetchFormData();
+ 
       if (!product)
         return res.status(404).render('users/error', { message: 'Producto no encontrado.' });
 
@@ -140,7 +136,8 @@ const productsController = {
         product,
         categories,
         brands,
-        message: null
+        errors: [],
+        oldData: {}
       });
     } catch (error) {
       console.error(error);
@@ -150,28 +147,40 @@ const productsController = {
 
   // 🔄 Actualizar producto
   postEditProduct: async (req, res) => {
-    const { productName, description, price, stock, category_id, brand_id } = req.body;
-    const file = req.file;
+    const product = await Product.findByPk(req.params.id);
+    if (!product) {
+      return res.status(404).render('users/error', { message: 'Producto no encontrado.' });
+    }
 
-    try {
-      const product = await Product.findByPk(req.params.id);
-      if (!product)
-        return res.status(404).render('users/error', { message: 'Producto no encontrado.' });
-
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const { categories, brands } = await fetchFormData();
+      return res.status(400).render('users/editProduct', {
+        pageTitle: `Editar Producto: ${product.name}`,
+        product,
+        categories,
+        brands,
+        errors: errors.array(),
+        oldData: req.body
+      });
+    }
+   try{
       let imageUrl = product.image;
-      if (file) {
-        imageUrl = `/img/products/${file.filename}`;
-        const oldPath = path.join(__dirname, '../../public', product.image);
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      if (req.file) {
+        imageUrl = `/img/products/${req.file.filename}`;
+        if (product.image && product.image.startsWith('/img/products/')) {
+          const oldPath = path.join(__dirname, '../../public', product.image);
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        }
       }
 
       await product.update({
-        name: productName,
-        description,
-        price: parseFloat(price),
-        stock: parseInt(stock),
-        category_id: parseInt(category_id),
-        brand_id: parseInt(brand_id),
+        name: req.body.productName,
+        description: req.body.description,
+        price: parseFloat(req.body.price),
+        stock: parseInt(req.body.stock, 10),
+        category_id: parseInt(req.body.category_id, 10),
+        brand_id: parseInt(req.body.brand_id, 10),
         image: imageUrl
       });
 

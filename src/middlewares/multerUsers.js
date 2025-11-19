@@ -12,20 +12,30 @@ if (!fs.existsSync(destFolder)) {
 }
 
 const storage = multer.diskStorage({
-    // La función 'destination' ya usa la ruta absoluta calculada
-    destination: (req, file, cb) => cb(null, destFolder),
-    
-    // Genera un nombre de archivo único
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname);
-        // Nombre: timestamp + extensión
-        cb(null, Date.now() + ext);
-    }
+  destination: (req, file, cb) => cb(null, destFolder),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `${Date.now()}${ext}`);
+  }
 });
 
+const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
+const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+
 const upload = multer({
-    storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // Límite de 2MB
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const isValid = allowedExtensions.includes(ext) && allowedMimeTypes.includes(file.mimetype);
+
+    if (!isValid) {
+      return cb(new Error('Solo se permiten imágenes JPG, JPEG, PNG o WEBP de hasta 2MB.'));
+    }
+
+    cb(null, true);
+  }
 });
 
 module.exports = upload;
