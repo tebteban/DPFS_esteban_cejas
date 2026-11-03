@@ -8,52 +8,161 @@
     <%- include('../partials/header') %>
 
     <main class="flex-grow">
-        <section class="max-w-container mx-auto px-4 md:px-8 py-12 md:py-20">
-            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-                <div class="space-y-6">
-                    <p class="eyebrow">Vóley indoor · Posición 6</p>
-                    <h1 class="display-xxl">El juego empieza abajo.</h1>
-                    <p class="text-lg font-medium text-body max-w-lg">
-                        El ataque gana puntos; la defensa gana partidos. Zona 6 nace en el fondo de la cancha, donde no hay segundas oportunidades y cada pelota se pelea contra el piso.
-                    </p>
-                    <div class="flex flex-wrap gap-3">
-                        <a class="btn btn-primary btn-lg" href="/productos">Ver colección</a>
-                        <a class="btn btn-subtle btn-lg" href="#lineas">Conocer las líneas</a>
+        <!-- Slider de portada -->
+        <section class="max-w-container mx-auto px-4 md:px-8 pt-4 md:pt-6" aria-roledescription="carrusel" aria-label="Novedades">
+            <div class="hero-slider" id="heroSlider">
+                <div class="hero-slide is-active" aria-roledescription="diapositiva" aria-label="1 de 3">
+                    <div class="relative min-h-[460px] md:min-h-[560px] flex items-end">
+                        <img src="/img/equipo.jpg" alt="" class="hero-img absolute inset-0 w-full h-full object-cover grayscale">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10"></div>
+                        <div class="hero-copy relative p-6 pb-24 md:p-12 text-white max-w-2xl space-y-4">
+                            <p class="eyebrow !text-mute">Vóley indoor · Posición 6</p>
+                            <h1 class="display-xxl">El juego empieza abajo.</h1>
+                            <p class="text-lg font-medium text-white/80">El ataque gana puntos; la defensa gana partidos. Equipamiento técnico para el fondo de la cancha.</p>
+                            <div class="flex flex-wrap gap-3 pt-2">
+                                <a class="btn btn-secondary btn-lg" href="/productos">Ver colección</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-canvas-soft">
-                    <img alt="Equipo de vóley en defensa" class="w-full h-full object-cover grayscale" src="/img/equipo.jpg"/>
+
+                <div class="hero-slide" aria-roledescription="diapositiva" aria-label="2 de 3">
+                    <div class="min-h-[460px] md:min-h-[560px] grid md:grid-cols-2 items-center gap-6 p-6 pb-24 md:p-12 text-white">
+                        <div class="hero-copy space-y-4">
+                            <p class="eyebrow !text-mute">Comprá fácil</p>
+                            <h2 class="display-xxl">Pagá con Mercado Pago.</h2>
+                            <p class="text-lg font-medium text-white/80">Tarjeta de crédito, débito o dinero en cuenta. Elegí, pagá y listo.</p>
+                            <div class="pt-2"><a class="btn btn-secondary btn-lg" href="/productos">Empezar a comprar</a></div>
+                        </div>
+                        <div class="hidden md:flex justify-center">
+                            <div class="rounded-2xl bg-white p-8 w-72 h-72"><img src="/img/products/rodillera.jpg" alt="" class="hero-img w-full h-full object-contain"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-slide bg-canvas-soft" aria-roledescription="diapositiva" aria-label="3 de 3">
+                    <div class="min-h-[460px] md:min-h-[560px] grid md:grid-cols-2 items-center gap-6 p-6 pb-24 md:p-12">
+                        <div class="hero-copy space-y-4">
+                            <p class="eyebrow">Línea Z6 Slide</p>
+                            <h2 class="display-xxl">Hecha para tirarse al piso.</h2>
+                            <p class="text-lg font-medium text-body">Calzas y shorts de poliamida de alta densidad que aguantan cada deslizamiento.</p>
+                            <div class="pt-2"><a class="btn btn-primary btn-lg" href="/productos?categoria=1">Ver indumentaria</a></div>
+                        </div>
+                        <div class="hidden md:flex justify-center">
+                            <div class="rounded-2xl bg-white p-8 w-72 h-72"><img src="/img/products/calza.png" alt="" class="hero-img w-full h-full object-contain"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 flex items-center gap-3">
+                    <div class="flex items-center gap-2 rounded-full bg-black/50 backdrop-blur px-3 py-2.5">
+                        <% for (let i = 0; i < 3; i++) { %>
+                            <button class="hero-dot <%= i === 0 ? 'is-active' : '' %>" data-slide="<%= i %>" aria-label="Ir a la diapositiva <%= i + 1 %>"></button>
+                        <% } %>
+                    </div>
+                    <button class="icon-btn !bg-white/90" data-hero="prev" aria-label="Anterior"><span class="material-icons-outlined">chevron_left</span></button>
+                    <button class="icon-btn !bg-white/90" data-hero="next" aria-label="Siguiente"><span class="material-icons-outlined">chevron_right</span></button>
                 </div>
             </div>
         </section>
 
-        <section id="lineas" class="max-w-container mx-auto px-4 md:px-8 pb-16">
-            <h2 class="display-xl mb-2">Lectura y respuesta</h2>
-            <p class="text-body mb-8 max-w-2xl">Vestimenta técnica pensada para resistir la fricción y responder al instante.</p>
+        <!-- Beneficios -->
+        <section class="max-w-container mx-auto px-4 md:px-8 py-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="card-dark !p-5 flex items-center gap-4 reveal">
+                    <span class="material-icons-outlined text-3xl">credit_card</span>
+                    <div><p class="font-medium">Pagá con Mercado Pago</p><p class="text-sm text-mute">Crédito, débito o dinero en cuenta</p></div>
+                </div>
+                <div class="card-dark !p-5 flex items-center gap-4 reveal" style="--d: 80ms">
+                    <span class="material-icons-outlined text-3xl">local_shipping</span>
+                    <div><p class="font-medium">Envíos a todo el país</p><p class="text-sm text-mute">Coordinamos la entrega con vos</p></div>
+                </div>
+                <div class="card-dark !p-5 flex items-center gap-4 reveal" style="--d: 160ms">
+                    <span class="material-icons-outlined text-3xl">verified</span>
+                    <div><p class="font-medium">Diseño argentino</p><p class="text-sm text-mute">Producción nacional, pensada para vóley</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Destacados -->
+        <% if (featured.length > 0) { %>
+        <section class="max-w-container mx-auto px-4 md:px-8 py-12">
+            <div class="flex items-end justify-between gap-4 mb-6 reveal">
+                <div>
+                    <p class="eyebrow mb-1">Lo último</p>
+                    <h2 class="display-xl">Destacados</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button class="icon-btn" data-carousel-prev="featuredTrack" aria-label="Anterior"><span class="material-icons-outlined">chevron_left</span></button>
+                    <button class="icon-btn" data-carousel-next="featuredTrack" aria-label="Siguiente"><span class="material-icons-outlined">chevron_right</span></button>
+                </div>
+            </div>
+            <div class="carousel" id="featuredTrack">
+                <% featured.forEach((product, index) => { %>
+                    <%- include('../partials/productCard', { product, index, compact: true }) %>
+                <% }) %>
+            </div>
+        </section>
+        <% } %>
+
+        <!-- Franja animada -->
+        <div class="marquee my-4" aria-hidden="true">
+            <div class="marquee-track">
+                <% for (let i = 0; i < 2; i++) { %>
+                    <span>El juego empieza abajo</span><span>·</span><span>Zona 6</span><span>·</span>
+                    <span>Defensa gana partidos</span><span>·</span><span>Hecho en Argentina</span><span>·</span>
+                    <span>Cada pelota se pelea</span><span>·</span>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Colecciones -->
+        <section class="max-w-container mx-auto px-4 md:px-8 py-12">
+            <h2 class="display-xl mb-6 reveal">Colecciones</h2>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <% categories.forEach((cat, index) => {
+                    const withImage = cat.products.find(p => p.image && p.image.startsWith('/'));
+                %>
+                    <a href="/productos?categoria=<%= cat.id %>" class="collection-card group reveal <%= withImage ? '' : '!bg-ink' %>" style="--d: <%= index * 80 %>ms">
+                        <% if (withImage) { %>
+                            <img src="<%= withImage.image %>" alt="" loading="lazy" class="!object-contain p-6 mix-blend-multiply">
+                        <% } else { %>
+                            <span class="material-icons-outlined absolute inset-0 flex items-center justify-center text-white/80 !text-7xl transition-transform duration-500 group-hover:scale-110" aria-hidden="true">sports_volleyball</span>
+                        <% } %>
+                        <span class="btn btn-floating !min-h-0 !py-2 text-sm"><%= cat.name %></span>
+                    </a>
+                <% }) %>
+            </div>
+        </section>
+
+        <!-- Líneas -->
+        <section class="max-w-container mx-auto px-4 md:px-8 py-12">
+            <div class="reveal">
+                <h2 class="display-xl mb-2">Lectura y respuesta</h2>
+                <p class="text-body mb-8 max-w-2xl">Vestimenta técnica pensada para resistir la fricción y responder al instante.</p>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="card-soft space-y-2">
+                <div class="card-soft space-y-2 reveal">
                     <span class="material-icons-outlined text-3xl">shield</span>
                     <h3 class="display-sm">Z6 Slide</h3>
                     <p class="text-body">Shorts y calzas con entramado de poliamida y elastano de alta densidad para soportar el deslizamiento.</p>
-                    <a class="btn btn-secondary mt-2" href="/productos?categoria=1">Ver indumentaria</a>
                 </div>
-                <div class="card-soft space-y-2">
+                <div class="card-soft space-y-2 reveal" style="--d: 80ms">
                     <span class="material-icons-outlined text-3xl">bolt</span>
                     <h3 class="display-sm">Z6 Match</h3>
                     <p class="text-body">Camisetas de juego con corte de sisa raglán corrida para una batida de remate limpia y sin tirones.</p>
-                    <a class="btn btn-secondary mt-2" href="/productos?categoria=1">Ver camisetas</a>
                 </div>
-                <div class="card-soft space-y-2">
+                <div class="card-soft space-y-2 reveal" style="--d: 160ms">
                     <span class="material-icons-outlined text-3xl">local_fire_department</span>
                     <h3 class="display-sm">Z6 Baseline</h3>
                     <p class="text-body">Remeras de calentamiento livianas y buzos térmicos half-zip pensados para traslados y descansos.</p>
-                    <a class="btn btn-secondary mt-2" href="/productos">Ver todo</a>
                 </div>
             </div>
         </section>
 
+        <!-- Newsletter -->
         <section class="max-w-container mx-auto px-4 md:px-8 pb-16">
-            <div class="card-dark md:!p-12 grid md:grid-cols-2 gap-8 items-center">
+            <div class="card-dark md:!p-12 grid md:grid-cols-2 gap-8 items-center reveal">
                 <div>
                     <h2 class="display-lg mb-2">En cada pelota</h2>
                     <p class="text-mute">Suscribite al newsletter y recibí las novedades de la colección.</p>
@@ -76,6 +185,45 @@
             e.target.reset();
             document.getElementById('newsletterOk').classList.remove('hidden');
         });
+
+        // Slider de portada: avanza solo cada 6s, se pausa con el mouse o el foco, y no se mueve si el usuario pidió menos animaciones
+        (() => {
+            const slider = document.getElementById('heroSlider');
+            const slides = slider.querySelectorAll('.hero-slide');
+            const dots = slider.querySelectorAll('.hero-dot');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let current = 0;
+            let timer;
+
+            const show = (i) => {
+                current = (i + slides.length) % slides.length;
+                slides.forEach((s, n) => { s.classList.toggle('is-active', n === current); s.inert = n !== current; });
+                dots.forEach((d, n) => { d.classList.toggle('is-active', n === current); d.setAttribute('aria-current', n === current); });
+            };
+            const play = () => { if (!reduceMotion) { clearInterval(timer); timer = setInterval(() => show(current + 1), 6000); } };
+            const pause = () => clearInterval(timer);
+
+            dots.forEach(d => d.addEventListener('click', () => { show(+d.dataset.slide); play(); }));
+            slider.querySelector('[data-hero="prev"]').addEventListener('click', () => { show(current - 1); play(); });
+            slider.querySelector('[data-hero="next"]').addEventListener('click', () => { show(current + 1); play(); });
+            slider.addEventListener('mouseenter', pause);
+            slider.addEventListener('mouseleave', play);
+            slider.addEventListener('focusin', pause);
+            slider.addEventListener('focusout', play);
+
+            // Deslizar con el dedo en mobile
+            let startX = null;
+            slider.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+            slider.addEventListener('touchend', (e) => {
+                if (startX === null) return;
+                const dx = e.changedTouches[0].clientX - startX;
+                if (Math.abs(dx) > 40) { show(current + (dx < 0 ? 1 : -1)); play(); }
+                startX = null;
+            });
+
+            show(0);
+            play();
+        })();
     </script>
 </body>
 </html>

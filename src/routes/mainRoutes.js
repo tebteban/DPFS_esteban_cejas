@@ -8,4 +8,8 @@ router.get('/login', (req, res) => res.redirect('/users/login'));
 router.get('/register', (req, res) => res.redirect('/users/register'));
 router.get('/cart', mainController.getCart);
 
+const withdrawalController = require('../controllers/withdrawalController');
+router.get('/arrepentimiento', withdrawalController.form);
+router.post('/arrepentimiento', withdrawalController.submit);
+
 module.exports = router;

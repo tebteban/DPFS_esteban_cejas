@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Editar perfil - Zona 6</title>
+</head>
+<body class="flex flex-col min-h-screen">
+    <%- include('../partials/header') %>
+
+    <main class="flex-grow flex justify-center px-4 py-10 md:py-14">
+        <div class="card-soft md:!p-8 max-w-2xl w-full reveal">
+            <h1 class="display-lg mb-6">Editar perfil</h1>
+
+            <%- include('../partials/errors') %>
+
+            <form action="/users/profile/edit" method="POST" enctype="multipart/form-data" class="space-y-5">
+                <div class="flex items-center gap-4">
+                    <img src="<%= avatarImg(oldData.image) %>" alt="" class="h-20 w-20 rounded-full object-cover"
+                         onerror="this.onerror=null;this.src='/img/users/default.svg';">
+                    <div class="flex-grow">
+                        <label class="label" for="image">Cambiar foto (opcional)</label>
+                        <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/webp" class="input"/>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label class="label" for="firstName">Nombre</label>
+                        <input class="input" id="firstName" name="firstName" value="<%= oldData.firstName || '' %>" autocomplete="given-name" required>
+                    </div>
+                    <div>
+                        <label class="label" for="lastName">Apellido</label>
+                        <input class="input" id="lastName" name="lastName" value="<%= oldData.lastName || '' %>" autocomplete="family-name" required>
+                    </div>
+                </div>
+
+                <fieldset class="border-t border-pressed pt-5">
+                    <legend class="display-sm pr-2">Cambiar contraseña</legend>
+                    <p class="text-sm text-body mb-4">Dejalo vacío si no querés cambiarla.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="label" for="currentPassword">Contraseña actual</label>
+                            <input class="input" id="currentPassword" name="currentPassword" type="password" autocomplete="current-password">
+                        </div>
+                        <div>
+                            <label class="label" for="newPassword">Contraseña nueva</label>
+                            <input class="input" id="newPassword" name="newPassword" type="password" autocomplete="new-password">
+                            <p class="hint">Mínimo 8 caracteres, con mayúscula, minúscula y número.</p>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+                    <a href="/users/profile" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

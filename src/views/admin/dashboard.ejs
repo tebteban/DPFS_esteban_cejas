@@ -11,6 +11,9 @@
         const totalProducts = products.length;
         const lowStockCount = products.filter(p => p.stock < 5).length;
         const totalValue = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+        const paidOrders = orders.filter(o => o.status === 'approved');
+        const salesTotal = paidOrders.reduce((acc, o) => acc + Number(o.total), 0);
+        const visibleOrders = orders.filter(o => !['cancelled', 'expired'].includes(o.status));
         const chartData = products.map(p => ({ name: p.name, stock: p.stock, category: p.category ? p.category.name : 'Sin categoría' }));
     %>
 
@@ -28,18 +31,22 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <div class="card-dark">
+                <p class="text-sm text-mute mb-1">Ventas pagadas (<%= paidOrders.length %>)</p>
+                <p class="display-md">$<%= salesTotal.toLocaleString('es-AR', { minimumFractionDigits: 2 }) %></p>
+            </div>
             <div class="card-soft">
                 <p class="text-sm text-body mb-1">Total de productos</p>
-                <p class="display-lg"><%= totalProducts %></p>
+                <p class="display-md"><%= totalProducts %></p>
             </div>
             <div class="<%= lowStockCount > 0 ? 'card-dark' : 'card-soft' %>">
                 <p class="text-sm <%= lowStockCount > 0 ? 'text-mute' : 'text-body' %> mb-1">Stock crítico (menos de 5)</p>
-                <p class="display-lg"><%= lowStockCount %></p>
+                <p class="display-md"><%= lowStockCount %></p>
             </div>
             <div class="card-soft">
                 <p class="text-sm text-body mb-1">Valor de inventario</p>
-                <p class="display-lg">$<%= Number(totalValue).toLocaleString('es-AR', { minimumFractionDigits: 2 }) %></p>
+                <p class="display-md">$<%= Number(totalValue).toLocaleString('es-AR', { minimumFractionDigits: 2 }) %></p>
             </div>
         </div>
 
@@ -53,6 +60,55 @@
                 <div class="h-64"><canvas id="categoryChart" aria-label="Gráfico de productos por categoría" role="img"></canvas></div>
             </div>
         </div>
+
+        <h2 class="display-md mb-4">Pedidos</h2>
+        <div class="rounded-2xl overflow-x-auto border border-canvas-soft mb-10">
+            <table class="table">
+                <thead>
+                    <tr><th>Pedido</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th></tr>
+                </thead>
+                <tbody>
+                    <% if (visibleOrders.length > 0) { %>
+                        <% visibleOrders.forEach(order => { %>
+                            <tr>
+                                <td class="font-medium whitespace-nowrap">#<%= order.id %></td>
+                                <td class="whitespace-nowrap text-body"><%= order.createdAt.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }) %></td>
+                                <td class="min-w-[220px]"><%= order.user ? order.user.firstName + ' ' + order.user.lastName : 'Invitado' %><br><span class="text-body"><%= order.email || '' %></span>
+                                    <% if (order.shipping_address) { %>
+                                        <br><span class="text-body"><%= order.shipping_name %> · <%= order.shipping_phone %><br><%= order.shipping_address %>, <%= order.shipping_city %>, <%= order.shipping_province %> (<%= order.shipping_zip %>)</span>
+                                        <% if (order.shipping_notes) { %><br><span class="text-body italic"><%= order.shipping_notes %></span><% } %>
+                                    <% } %></td>
+                                <td class="min-w-[200px] text-body"><% order.items.forEach(item => { %><%= item.quantity %>× <%= item.name %><%= item.size ? ' · Talle ' + item.size : '' %><br><% }) %></td>
+                                <td class="whitespace-nowrap font-medium">$<%= Number(order.total).toFixed(2) %></td>
+                                <td><span class="chip !py-1 <%= order.status === 'approved' ? 'chip-active' : '' %>"><%= orderStatus(order.status) %></span></td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="6" class="!py-8 text-center text-body">Todavía no hay pedidos</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <% if (withdrawals.length > 0) { %>
+            <h2 class="display-md mb-4">Solicitudes de arrepentimiento</h2>
+            <div class="rounded-2xl overflow-x-auto border border-canvas-soft mb-10">
+                <table class="table">
+                    <thead><tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Pedido</th><th>Motivo</th></tr></thead>
+                    <tbody>
+                        <% withdrawals.forEach(w => { %>
+                            <tr>
+                                <td class="font-medium whitespace-nowrap"><%= w.code %></td>
+                                <td class="whitespace-nowrap text-body"><%= w.createdAt.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' }) %></td>
+                                <td class="min-w-[180px]"><%= w.name %><br><span class="text-body"><%= w.email %></span></td>
+                                <td><%= w.order_id ? '#' + w.order_id : '—' %></td>
+                                <td class="min-w-[220px] text-body"><%= w.reason || '—' %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
 
         <h2 class="display-md mb-4">Inventario</h2>
         <div class="rounded-2xl overflow-x-auto border border-canvas-soft">
@@ -82,6 +138,9 @@
                                     <span class="chip !py-1 <%= product.stock < 5 ? 'chip-active' : '' %>">
                                         <%= product.stock > 0 ? product.stock + ' disp.' : 'Agotado' %>
                                     </span>
+                                    <% if (product.variants.length) { %>
+                                        <div class="text-xs text-body mt-1 whitespace-nowrap"><%= product.variants.map(v => v.size + ': ' + v.stock).join(' · ') %></div>
+                                    <% } %>
                                 </td>
                                 <td class="text-body"><%= product.category ? product.category.name : 'N/A' %></td>
                                 <td>

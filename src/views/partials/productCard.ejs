@@ -1,0 +1,35 @@
+<article class="product-card flex flex-col reveal" style="--d: <%= (locals.index || 0) % 4 * 80 %>ms">
+    <a href="/productos/<%= product.id %>" class="block">
+        <div class="product-media mb-4 relative">
+            <img src="<%= productImg(product.image) %>" alt="<%= product.name %>" loading="lazy"
+                 onerror="this.onerror=null;this.src='/img/products/default.svg'"/>
+            <% if (product.images && product.images.length) { %>
+                <img src="<%= product.images[0].url %>" alt="" loading="lazy" class="img-hover" aria-hidden="true"/>
+            <% } %>
+            <% if (product.stock > 0 && product.stock < 5) { %>
+                <span class="chip chip-active !py-1 text-xs absolute top-3 left-3">Últimas unidades</span>
+            <% } else if (product.stock === 0) { %>
+                <span class="chip !py-1 text-xs absolute top-3 left-3">Agotado</span>
+            <% } %>
+        </div>
+        <% if (product.category) { %><p class="eyebrow mb-1"><%= product.category.name %></p><% } %>
+        <h3 class="font-medium line-clamp-2"><%= product.name %></h3>
+        <% if (!locals.compact) { %><p class="text-sm text-body line-clamp-2 mt-1"><%= product.description %></p><% } %>
+    </a>
+    <div class="flex items-center justify-between gap-3 mt-auto pt-4">
+        <p class="display-sm">$<%= Number(product.price).toFixed(2) %></p>
+        <% if (product.stock > 0 && product.sizeList().length) { %>
+            <a href="/productos/<%= product.id %>" class="btn btn-subtle">Elegir talle</a>
+        <% } else if (product.stock > 0) { %>
+            <button class="btn btn-subtle add-to-cart-btn"
+                    data-product-id="<%= product.id %>"
+                    data-product-name="<%= product.name %>"
+                    data-product-price="<%= product.price %>"
+                    data-product-image="<%= productImg(product.image) %>">
+                Agregar
+            </button>
+        <% } else { %>
+            <button class="btn" disabled>Agotado</button>
+        <% } %>
+    </div>
+</article>

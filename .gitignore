@@ -1,0 +1,4 @@
+.env
+database.sqlite
+test-results/
+playwright-report/

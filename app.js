@@ -77,7 +77,11 @@ app.use(rememberMiddleware);
 
 // Helpers de imagen disponibles en todas las vistas (fallback si falta la foto)
 app.locals.productImg = (img) => !img || img === 'default.jpg' ? '/img/products/default.svg' : img.startsWith('/') ? img : '/img/products/' + img;
-app.locals.avatarImg = (img) => !img || img.endsWith('default.jpg') ? '/img/users/default.svg' : img;
+app.locals.orderStatus = (s) => ({
+  pending: 'Pendiente', in_process: 'En proceso', approved: 'Pagado', rejected: 'Rechazado',
+  cancelled: 'Cancelado', expired: 'Vencido', refunded: 'Devuelto', charged_back: 'Contracargo', review: 'En revisión'
+}[s] || s);
+app.locals.avatarImg =(img) => !img || img.endsWith('default.jpg') ? '/img/users/default.svg' : img;
 
 // Middleware ÚNICO para pasar el usuario a todas las vistas (res.locals.user)
 app.use((req, res, next) => {
@@ -115,6 +119,7 @@ app.use('/', mainRoutes);
 app.use('/users', usersRoutes);
 app.use('/productos', productsRoutes);
 app.use('/admin', adminRoutes);
+app.use('/checkout', require('./src/routes/checkoutRoutes'));
 
 // --- 404 y manejo de errores ---
 app.use((req, res) => {

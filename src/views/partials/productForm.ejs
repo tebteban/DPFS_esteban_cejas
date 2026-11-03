@@ -4,6 +4,12 @@
   const old = locals.oldData || {};
   const val = (field, fallback) => old[field] !== undefined ? old[field] : (fallback ?? '');
   const isEdit = Boolean(locals.product);
+  // Filas de talles: las reenviadas con errores, o las guardadas del producto
+  const oldSizes = [].concat(old.variant_size || []);
+  const oldStocks = [].concat(old.variant_stock || []);
+  const variantRows = oldSizes.length
+    ? oldSizes.map((size, i) => ({ size, stock: oldStocks[i] }))
+    : (old.productName === undefined ? (p.variants || []) : []);
 %>
 <form action="<%= isEdit ? '/productos/editProduct/' + p.id : '/productos/createProduct' %>" method="POST" enctype="multipart/form-data" class="space-y-5">
   <div>
@@ -24,10 +30,11 @@
       <input id="price" name="price" type="number" step="0.01" min="0" placeholder="14999" required
              class="input" value="<%= val('price', p.price) %>">
     </div>
-    <div>
+    <div id="singleStock" <%= variantRows.length ? 'hidden' : '' %>>
       <label for="stock" class="label">Stock</label>
-      <input id="stock" name="stock" type="number" min="0" placeholder="25" required
-             class="input" value="<%= val('stock', p.stock) %>">
+      <input id="stock" name="stock" type="number" min="0" placeholder="25" class="input" value="<%= val('stock', p.stock) %>"
+             <%= variantRows.length ? 'disabled' : 'required' %>>
+      <p class="hint">Si el producto tiene talles, cargá la cantidad de cada uno abajo.</p>
     </div>
   </div>
 
@@ -61,11 +68,96 @@
       </div>
     <% } %>
     <input id="productImage" name="productImage" type="file" accept="image/jpeg,image/png,image/webp" <%= isEdit ? '' : 'required' %> class="input"/>
-    <p class="hint">JPG, PNG o WEBP de hasta 2MB.</p>
+    <p class="hint">Foto principal. JPG, PNG o WEBP de hasta 2MB.</p>
   </div>
+
+  <div>
+    <label for="galleryImages" class="label">Más fotos (opcional)</label>
+    <% if (isEdit && p.images && p.images.length) { %>
+      <div class="flex flex-wrap gap-3 mb-3">
+        <% p.images.forEach(img => { %>
+          <label class="relative cursor-pointer">
+            <img src="<%= img.url %>" alt="" class="w-20 h-20 object-contain bg-white rounded-xl p-2">
+            <span class="flex items-center gap-1 text-xs text-body mt-1">
+              <input type="checkbox" name="removeImages" value="<%= img.id %>" class="accent-black"> Quitar
+            </span>
+          </label>
+        <% }) %>
+      </div>
+    <% } %>
+    <input id="galleryImages" name="galleryImages" type="file" multiple accept="image/jpeg,image/png,image/webp" class="input"/>
+    <p class="hint">Hasta 6 fotos por vez. Se muestran en la galería del producto y al pasar el mouse en el catálogo.</p>
+  </div>
+
+  <fieldset>
+    <legend class="label">Talles y cantidades</legend>
+    <p class="hint !mt-0 mb-3">Sin talles = talle único (se usa el campo "Stock"). Con talles, el stock total es la suma.</p>
+    <div id="variantRows" class="space-y-2">
+      <% variantRows.forEach(v => { %>
+        <div class="variant-row flex gap-2">
+          <input name="variant_size[]" value="<%= v.size %>" placeholder="Talle (ej: M)" aria-label="Talle" class="input" maxlength="20" required>
+          <input name="variant_stock[]" value="<%= v.stock %>" type="number" min="0" placeholder="Cantidad" aria-label="Cantidad" class="input !w-36" required>
+          <button type="button" class="icon-btn shrink-0 remove-variant" aria-label="Quitar talle"><span class="material-icons-outlined">close</span></button>
+        </div>
+      <% }) %>
+    </div>
+    <div class="flex flex-wrap items-center gap-3 mt-3">
+      <button type="button" id="addVariant" class="btn btn-subtle !min-h-0 !py-2 text-sm">
+        <span class="material-icons-outlined text-lg">add</span> Agregar talle
+      </button>
+      <button type="button" id="addLetterSizes" class="btn btn-secondary !min-h-0 !py-2 text-sm">Cargar S a XXL</button>
+      <span id="variantTotal" class="text-sm text-body ml-auto"></span>
+    </div>
+    <template id="variantTemplate">
+      <div class="variant-row flex gap-2">
+        <input name="variant_size[]" placeholder="Talle (ej: M)" aria-label="Talle" class="input" maxlength="20" required>
+        <input name="variant_stock[]" type="number" min="0" placeholder="Cantidad" aria-label="Cantidad" class="input !w-36" required>
+        <button type="button" class="icon-btn shrink-0 remove-variant" aria-label="Quitar talle"><span class="material-icons-outlined">close</span></button>
+      </div>
+    </template>
+  </fieldset>
 
   <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
     <a href="/admin" class="btn btn-secondary">Cancelar</a>
     <button type="submit" class="btn btn-primary"><%= isEdit ? 'Guardar cambios' : 'Cargar producto' %></button>
   </div>
 </form>
+<script>
+  // Filas de talles: agregar, quitar y mostrar el total; sin filas vuelve el campo "Stock" de talle único
+  (() => {
+    const rows = document.getElementById('variantRows');
+    const template = document.getElementById('variantTemplate');
+    const single = document.getElementById('singleStock');
+    const stock = document.getElementById('stock');
+    const total = document.getElementById('variantTotal');
+
+    const refresh = () => {
+      const inputs = rows.querySelectorAll('input[name="variant_stock[]"]');
+      const hasRows = inputs.length > 0;
+      single.hidden = hasRows;
+      stock.disabled = hasRows;
+      stock.required = !hasRows;
+      const sum = [...inputs].reduce((acc, i) => acc + (parseInt(i.value) || 0), 0);
+      total.textContent = hasRows ? `Total: ${sum} unidades` : '';
+    };
+    const addRow = (size = '') => {
+      const row = template.content.firstElementChild.cloneNode(true);
+      row.querySelector('input').value = size;
+      rows.appendChild(row);
+      refresh();
+      return row;
+    };
+
+    document.getElementById('addVariant').addEventListener('click', () => addRow().querySelector('input').focus());
+    document.getElementById('addLetterSizes').addEventListener('click', () => {
+      const existing = [...rows.querySelectorAll('input[name="variant_size[]"]')].map(i => i.value.trim().toUpperCase());
+      ['S', 'M', 'L', 'XL', 'XXL'].filter(s => !existing.includes(s)).forEach(s => addRow(s));
+    });
+    rows.addEventListener('click', (e) => {
+      const btn = e.target.closest('.remove-variant');
+      if (btn) { btn.closest('.variant-row').remove(); refresh(); }
+    });
+    rows.addEventListener('input', refresh);
+    refresh();
+  })();
+</script>

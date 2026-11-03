@@ -4,6 +4,26 @@ const path = require('path');
 const allowedExtensions = ['.jpg', '.jpeg', '.png', '.webp'];
 const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
 
+// Filas "talle | cantidad" del formulario -> [{ size, stock }]; vacío = talle único
+const parseVariants = (body) => {
+  const sizes = [].concat(body.variant_size || []);
+  const stocks = [].concat(body.variant_stock || []);
+  return sizes
+    .map((size, i) => ({ size: String(size).trim().toUpperCase(), stock: Number(stocks[i]) }))
+    .filter(v => v.size);
+};
+
+const variantsValidation = body('variant_size').custom((value, { req }) => {
+  const variants = parseVariants(req.body);
+  if (variants.length > 20) throw new Error('Podés cargar hasta 20 talles.');
+  for (const v of variants) {
+    if (v.size.length > 20 || !/^[\p{L}\d ./-]+$/u.test(v.size)) throw new Error(`El talle "${v.size}" tiene caracteres inválidos.`);
+    if (!Number.isInteger(v.stock) || v.stock < 0 || v.stock > 100000) throw new Error(`La cantidad del talle ${v.size} tiene que ser un número entero de 0 o más.`);
+  }
+  if (new Set(variants.map(v => v.size)).size !== variants.length) throw new Error('Hay talles repetidos.');
+  return true;
+});
+
 const baseProductValidation = [
   body('productName')
     .trim()
@@ -17,10 +37,13 @@ const baseProductValidation = [
     .notEmpty().withMessage('El precio es obligatorio.')
     .bail()
     .isFloat({ gt: 0 }).withMessage('El precio debe ser un número mayor que cero.'),
+  // Con talles, el stock total es la suma de cada talle y este campo no se usa
   body('stock')
+    .if((value, { req }) => parseVariants(req.body).length === 0)
     .notEmpty().withMessage('El stock es obligatorio.')
     .bail()
     .isInt({ min: 0 }).withMessage('El stock debe ser un número entero mayor o igual a 0.'),
+  variantsValidation,
   body('category_id')
     .notEmpty().withMessage('Debes seleccionar una categoría.')
     .bail()
@@ -48,6 +71,7 @@ const createProductValidation = [...baseProductValidation, validateImage(false)]
 const updateProductValidation = [...baseProductValidation, validateImage(true)];
 
 module.exports = {
+  parseVariants,
   createProductValidation,
   updateProductValidation
 };

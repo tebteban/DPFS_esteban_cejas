@@ -40,7 +40,23 @@ const loginValidation = [
     .notEmpty().withMessage('Debes ingresar tu contraseña.')
 ];
 
+// Editar perfil: mismas reglas de nombre; la contraseña nueva es opcional y exige la actual
+const profileValidation = [
+  registerValidation[0],
+  registerValidation[1],
+  body('newPassword')
+    .optional({ values: 'falsy' })
+    .isLength({ min: 8 }).withMessage('La contraseña nueva debe tener al menos 8 caracteres.')
+    .matches(/[A-Z]/).withMessage('La contraseña nueva debe incluir al menos una letra mayúscula.')
+    .matches(/[a-z]/).withMessage('La contraseña nueva debe incluir al menos una letra minúscula.')
+    .matches(/[0-9]/).withMessage('La contraseña nueva debe incluir al menos un número.'),
+  body('currentPassword')
+    .if(body('newPassword').notEmpty())
+    .notEmpty().withMessage('Para cambiar la contraseña ingresá la actual.')
+];
+
 module.exports = {
   registerValidation,
-  loginValidation
+  loginValidation,
+  profileValidation
 };

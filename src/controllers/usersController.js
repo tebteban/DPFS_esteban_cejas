@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
+const { Op } = require('sequelize');
 const { validationResult } = require('express-validator');
-const { User } = require('../../models'); // importamos el modelo Sequelize
+const { User, Order } = require('../../models'); // importamos los modelos Sequelize
 
 const usersController = {
 
@@ -136,13 +139,53 @@ const usersController = {
         };
       }
 
-      res.render('users/profile', { user: req.session.userLogged });
+      const orders = await Order.findAll({
+        where: { user_id: req.session.userLogged.id, status: { [Op.notIn]: ['cancelled', 'expired'] } },
+        include: ['items'],
+        order: [['createdAt', 'DESC']]
+      });
+
+      res.render('users/profile', { user: req.session.userLogged, orders });
     } catch (error) {
       console.error('Error al actualizar sesión del usuario:', error);
       res.status(500).render('users/error', { message: 'Error al cargar el perfil.' });
     }
   },
 
+
+  // ✏️ Formulario de edición de perfil
+  editProfile: (req, res) => {
+    res.render('users/editProfile', { errors: [], oldData: req.session.userLogged });
+  },
+
+  // 💾 Guardar perfil (nombre, foto y opcionalmente contraseña)
+  updateProfile: async (req, res) => {
+    const errors = validationResult(req).array();
+    const user = await User.findByPk(req.session.userLogged.id);
+
+    if (errors.length === 0 && req.body.newPassword && !(await bcrypt.compare(req.body.currentPassword, user.password))) {
+      errors.push({ msg: 'La contraseña actual no es correcta.' });
+    }
+    if (errors.length) {
+      if (req.file) fs.unlinkSync(req.file.path);
+      return res.status(400).render('users/editProfile', { errors, oldData: { ...req.session.userLogged, ...req.body } });
+    }
+
+    const changes = { firstName: req.body.firstName, lastName: req.body.lastName };
+    if (req.file) {
+      changes.image = `/img/users/${req.file.filename}`;
+      // Borra la foto anterior (solo las subidas por usuarios)
+      if (user.image && user.image.startsWith('/img/users/')) {
+        const oldPath = path.join(__dirname, '../../public', user.image);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
+    }
+    if (req.body.newPassword) changes.password = await bcrypt.hash(req.body.newPassword, 10);
+    await user.update(changes);
+
+    req.session.userLogged = { ...req.session.userLogged, firstName: user.firstName, lastName: user.lastName, image: user.image };
+    res.redirect('/users/profile');
+  },
 
   // 🚪 Logout
   logout: (req, res) => {

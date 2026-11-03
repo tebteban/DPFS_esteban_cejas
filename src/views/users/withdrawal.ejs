@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Botón de arrepentimiento - Zona 6</title>
+</head>
+<body class="flex flex-col min-h-screen">
+    <%- include('../partials/header') %>
+
+    <main class="flex-grow flex justify-center px-4 py-10 md:py-14">
+        <div class="card-soft md:!p-8 max-w-2xl w-full reveal">
+            <% if (code) { %>
+                <div class="text-center">
+                    <span class="material-icons-outlined text-5xl mb-4">task_alt</span>
+                    <h1 class="display-md mb-2">Recibimos tu solicitud</h1>
+                    <p class="text-body mb-6">Guardá este código para hacer el seguimiento. Te vamos a contactar por email en las próximas 24 horas hábiles.</p>
+                    <p class="display-lg bg-white rounded-xl py-4 mb-6 select-all"><%= code %></p>
+                    <a href="/" class="btn btn-primary">Volver al inicio</a>
+                </div>
+            <% } else { %>
+                <h1 class="display-lg mb-2">Botón de arrepentimiento</h1>
+                <p class="text-body mb-6">
+                    Podés cancelar tu compra dentro de los 10 días corridos desde que la recibiste, sin costo y sin dar explicaciones
+                    (Ley 24.240, art. 34, y Resolución 424/2020).
+                </p>
+
+                <%- include('../partials/errors') %>
+
+                <form action="/arrepentimiento" method="POST" class="space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="label" for="name">Nombre y apellido</label>
+                            <input class="input" id="name" name="name" value="<%= oldData.name || '' %>" autocomplete="name" required maxlength="100">
+                        </div>
+                        <div>
+                            <label class="label" for="email">Email</label>
+                            <input class="input" id="email" name="email" type="email" value="<%= oldData.email || '' %>" autocomplete="email" required maxlength="120">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="label" for="order_id">Número de pedido (opcional)</label>
+                        <input class="input" id="order_id" name="order_id" inputmode="numeric" placeholder="Ej: 12" value="<%= oldData.order_id || '' %>">
+                        <p class="hint">Lo encontrás en "Mis compras" o en el email de confirmación.</p>
+                    </div>
+                    <div>
+                        <label class="label" for="reason">Motivo (opcional)</label>
+                        <textarea class="input" id="reason" name="reason" rows="3" maxlength="1000"><%= oldData.reason || '' %></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Solicitar la cancelación</button>
+                </form>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

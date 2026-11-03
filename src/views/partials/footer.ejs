@@ -21,8 +21,12 @@
             </ul>
         </div>
     </div>
-    <div class="max-w-container mx-auto px-4 md:px-8 pb-8">
-        <p class="text-xs text-mute">© <%= new Date().getFullYear() %> Zona 6. Todos los derechos reservados.</p>
+    <div class="max-w-container mx-auto px-4 md:px-8 pb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-4">
+            <a href="/arrepentimiento" class="btn btn-secondary !min-h-0 !py-2 text-sm">Botón de arrepentimiento</a>
+            <p class="text-xs text-mute">© <%= new Date().getFullYear() %> Zona 6. Todos los derechos reservados.</p>
+        </div>
+        <p class="text-xs text-mute flex items-center gap-2"><span class="material-icons-outlined text-base">lock</span> Pagos seguros con Mercado Pago</p>
     </div>
 </footer>
 
@@ -48,8 +52,8 @@
                 <span class="text-body">Total</span>
                 <span id="cartTotalDisplay" class="display-md">$0.00</span>
             </div>
-            <a href="/cart" class="btn btn-subtle btn-block">Ver pedido</a>
-            <button id="checkoutBtn" class="btn btn-primary btn-block">Pedir por WhatsApp</button>
+            <a href="/cart" class="btn btn-primary btn-block">Finalizar compra</a>
+            <button id="checkoutBtn" class="btn btn-subtle btn-block">Pedir por WhatsApp</button>
         </div>
     </div>
 </div>
@@ -89,7 +93,7 @@
                             </div>
                             <div class="flex-grow min-w-0">
                                 <h3 class="text-sm font-medium line-clamp-2">${escapeHtml(item.name)}</h3>
-                                <p class="text-sm text-body mt-1">$${formatMoney(item.price)}</p>
+                                <p class="text-sm text-body mt-1">${item.size ? 'Talle ' + escapeHtml(item.size) + ' · ' : ''}$${formatMoney(item.price)}</p>
                                 <div class="flex items-center mt-2 gap-2">
                                     <button class="icon-btn !w-8 !h-8 update-qty" data-index="${index}" data-action="minus" aria-label="Restar uno">−</button>
                                     <span class="text-sm font-medium w-6 text-center">${item.quantity}</span>
@@ -151,7 +155,7 @@
             cart.forEach(item => {
                 const sub = item.price * item.quantity;
                 total += sub;
-                message += `- ${item.quantity}x ${item.name} ($${formatMoney(item.price)}) = $${formatMoney(sub)}\n`;
+                message += `- ${item.quantity}x ${item.name}${item.size ? ' (talle ' + item.size + ')' : ''} ($${formatMoney(item.price)}) = $${formatMoney(sub)}\n`;
             });
             message += `\n*TOTAL: $${formatMoney(total)}*`;
 
@@ -159,24 +163,49 @@
             window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
         });
 
+        // Pago con Mercado Pago: mandamos solo id y cantidad; el servidor pone los precios
+        document.addEventListener('submit', (e) => {
+            if (!e.target.classList.contains('mp-checkout-form')) return;
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) return e.preventDefault();
+            e.target.cart.value = JSON.stringify(cart.map(({ id, quantity, size }) => ({ id, quantity, size })));
+            e.target.querySelector('button[type="submit"]').disabled = true;
+        });
+        // Al volver con "atrás" desde Mercado Pago, rehabilitar el botón
+        window.addEventListener('pageshow', () => document.querySelectorAll('.mp-checkout-form button[type="submit"]').forEach(b => b.disabled = false));
+
         // Agregar al carrito desde cualquier vista (botones .add-to-cart-btn)
         document.body.addEventListener('click', (e) => {
             const btn = e.target.closest('.add-to-cart-btn');
             if (!btn) return;
 
+            // Productos con talles: hay que elegir uno antes de agregar
+            let size = null;
+            if (btn.dataset.needsSize) {
+                const checked = document.querySelector('#sizePicker input:checked');
+                if (!checked) {
+                    document.getElementById('sizeError').classList.remove('hidden');
+                    const picker = document.getElementById('sizePicker');
+                    picker.classList.remove('shake'); void picker.offsetWidth; picker.classList.add('shake');
+                    return;
+                }
+                size = checked.value;
+                document.getElementById('sizeError').classList.add('hidden');
+            }
+
             const { productId, productName, productImage } = btn.dataset;
             const productPrice = parseFloat(btn.dataset.productPrice);
 
             const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const existing = cart.findIndex(item => item.id === productId);
+            const existing = cart.findIndex(item => item.id === productId && (item.size || null) === size);
             if (existing > -1) cart[existing].quantity += 1;
-            else cart.push({ id: productId, name: productName, price: productPrice, image: productImage, quantity: 1 });
+            else cart.push({ id: productId, name: productName, price: productPrice, image: productImage, size, quantity: 1 });
             localStorage.setItem('cart', JSON.stringify(cart));
 
             renderCart();
 
             Toastify({
-                text: `Agregado: ${productName}`,
+                text: `Agregado: ${productName}${size ? ' · Talle ' + size : ''}`,
                 duration: 3000,
                 gravity: 'bottom',
                 position: 'right',
@@ -195,4 +224,29 @@
 
         renderCart();
     });
+</script>
+
+<script>
+    // Animaciones globales: aparición al scroll, sombra del header y flechas de carruseles
+    (() => {
+        const io = new IntersectionObserver((entries) => entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+        }), { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+        const header = document.querySelector('header');
+        const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        document.querySelectorAll('[data-carousel-prev], [data-carousel-next]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const track = document.getElementById(btn.dataset.carouselPrev || btn.dataset.carouselNext);
+                const step = track.firstElementChild ? track.firstElementChild.offsetWidth + 24 : track.clientWidth;
+                track.scrollBy({ left: btn.dataset.carouselPrev ? -step : step });
+            });
+        });
+    })();
 </script>

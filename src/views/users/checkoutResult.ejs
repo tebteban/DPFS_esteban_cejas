@@ -1,0 +1,55 @@
+<%
+  const copy = {
+    success: { icon: 'check_circle', title: '¡Gracias por tu compra!', text: 'Recibimos tu pago. Te vamos a contactar para coordinar el envío.' },
+    pending: { icon: 'schedule', title: 'Tu pago está pendiente', text: 'Mercado Pago está procesando el pago. Te avisamos apenas se acredite.' },
+    failure: { icon: 'error_outline', title: 'El pago no se pudo completar', text: 'No se realizó ningún cobro. Podés intentarlo de nuevo o pedir por WhatsApp.' }
+  }[status];
+%>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title><%= copy.title %> - Zona 6</title>
+</head>
+<body class="flex flex-col min-h-screen">
+    <%- include('../partials/header') %>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-16">
+        <div class="card-soft md:!p-10 text-center max-w-md w-full reveal">
+            <span class="material-icons-outlined text-5xl mb-4"><%= copy.icon %></span>
+            <h1 class="display-md mb-2"><%= copy.title %></h1>
+            <p class="text-body mb-2"><%= copy.text %></p>
+            <% if (paymentId) { %><p class="text-sm text-body mb-6">N.º de operación: <span class="font-medium text-ink"><%= paymentId %></span></p><% } %>
+            <% if (order) { %>
+                <div class="bg-white rounded-xl p-4 text-left text-sm mt-4">
+                    <div class="flex justify-between mb-3">
+                        <span class="font-medium">Pedido #<%= order.id %></span>
+                        <span class="chip !py-1 <%= order.status === 'approved' ? 'chip-active' : '' %>"><%= orderStatus(order.status) %></span>
+                    </div>
+                    <% order.items.forEach(item => { %>
+                        <div class="flex justify-between py-1 text-body"><span><%= item.quantity %>× <%= item.name %><%= item.size ? ' · Talle ' + item.size : '' %></span><span>$<%= (item.unit_price * item.quantity).toFixed(2) %></span></div>
+                    <% }) %>
+                    <div class="flex justify-between border-t border-pressed mt-2 pt-2 font-medium"><span>Total</span><span>$<%= Number(order.total).toFixed(2) %></span></div>
+                </div>
+            <% } %>
+            <div class="flex flex-col gap-3 mt-6">
+                <% if (status === 'failure') { %>
+                    <a href="/cart" class="btn btn-primary">Volver al pedido</a>
+                <% } else { %>
+                    <a href="/productos" class="btn btn-primary">Seguir comprando</a>
+                <% } %>
+                <a href="/" class="btn btn-subtle">Ir al inicio</a>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+    <% if (status !== 'failure') { %>
+        <script>
+            // El pedido ya está en Mercado Pago: vaciamos el carrito local
+            localStorage.removeItem('cart');
+            document.addEventListener('DOMContentLoaded', () => document.getElementById('cartItemCount').classList.add('hidden'));
+        </script>
+    <% } %>
+</body>
+</html>

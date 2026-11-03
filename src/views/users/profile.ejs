@@ -28,11 +28,39 @@
                 </dl>
                 <div class="flex flex-wrap gap-3 mt-6">
                     <% if (user.role === 'admin') { %><a href="/admin" class="btn btn-primary">Ir al panel</a><% } %>
-                    <a href="/productos" class="btn btn-secondary">Ver catálogo</a>
+                    <a href="/users/profile/edit" class="btn btn-secondary">Editar perfil</a>
                     <a href="/users/logout" class="btn btn-secondary">Cerrar sesión</a>
                 </div>
             </div>
         </div>
+
+        <section class="mt-10">
+            <h2 class="display-md mb-4">Mis compras</h2>
+            <% if (orders.length > 0) { %>
+                <div class="space-y-4">
+                    <% orders.forEach(order => { %>
+                        <div class="card-soft !p-5 reveal">
+                            <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                <div>
+                                    <p class="font-medium">Pedido #<%= order.id %></p>
+                                    <p class="text-sm text-body"><%= order.createdAt.toLocaleDateString('es-AR', { dateStyle: 'long' }) %></p>
+                                </div>
+                                <span class="chip !py-1 <%= order.status === 'approved' ? 'chip-active' : '!bg-white' %>"><%= orderStatus(order.status) %></span>
+                            </div>
+                            <% order.items.forEach(item => { %>
+                                <div class="flex justify-between text-sm py-1"><span class="text-body"><%= item.quantity %>× <%= item.name %><%= item.size ? ' · Talle ' + item.size : '' %></span><span>$<%= (item.unit_price * item.quantity).toFixed(2) %></span></div>
+                            <% }) %>
+                            <div class="flex justify-between border-t border-pressed mt-2 pt-2 font-medium"><span>Total</span><span>$<%= Number(order.total).toFixed(2) %></span></div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <div class="card-soft text-center">
+                    <p class="text-body mb-4">Todavía no hiciste ninguna compra.</p>
+                    <a href="/productos" class="btn btn-primary">Ir al catálogo</a>
+                </div>
+            <% } %>
+        </section>
     </main>
 
     <%- include('../partials/footer') %>

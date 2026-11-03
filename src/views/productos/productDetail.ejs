@@ -1,3 +1,7 @@
+<%
+  const gallery = [productImg(product.image), ...product.images.map(i => i.url)];
+  const variants = product.variants || [];
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,15 +18,26 @@
     </a>
 
     <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-start">
-      <div class="product-media relative">
-        <% if (product.category) { %>
-          <span class="chip chip-active absolute top-4 left-4"><%= product.category.name %></span>
+      <div class="reveal">
+        <div class="product-media relative">
+          <% if (product.category) { %>
+            <span class="chip chip-active absolute top-4 left-4 z-10"><%= product.category.name %></span>
+          <% } %>
+          <img id="mainImage" src="<%= gallery[0] %>" alt="<%= product.name %>" class="fade-swap"
+               onerror="this.onerror=null;this.src='/img/products/default.svg'"/>
+        </div>
+        <% if (gallery.length > 1) { %>
+          <div class="flex flex-wrap gap-3 mt-4" role="group" aria-label="Fotos del producto">
+            <% gallery.forEach((url, i) => { %>
+              <button type="button" class="thumb" data-src="<%= url %>" aria-current="<%= i === 0 %>" aria-label="Ver foto <%= i + 1 %>">
+                <img src="<%= url %>" alt="" loading="lazy">
+              </button>
+            <% }) %>
+          </div>
         <% } %>
-        <img src="<%= productImg(product.image) %>" alt="<%= product.name %>"
-             onerror="this.onerror=null;this.src='/img/products/default.svg'"/>
       </div>
 
-      <div class="space-y-6">
+      <div class="space-y-6 reveal" style="--d: 100ms">
         <div>
           <% if (product.brand) { %><p class="eyebrow mb-2"><%= product.brand.name %></p><% } %>
           <h1 class="display-xl"><%= product.name %></h1>
@@ -36,12 +51,29 @@
           </p>
         </div>
 
+        <% if (variants.length && product.stock > 0) { %>
+          <fieldset id="sizePicker">
+            <legend class="label">Talle</legend>
+            <div class="flex flex-wrap gap-2">
+              <% variants.forEach(v => { %>
+                <label class="size-option" title="<%= v.stock === 0 ? 'Sin stock' : '' %>">
+                  <input type="radio" name="size" value="<%= v.size %>" data-stock="<%= v.stock %>" <%= v.stock === 0 ? 'disabled' : '' %>>
+                  <span><%= v.size %></span>
+                </label>
+              <% }) %>
+            </div>
+            <p id="sizeStock" class="hint" aria-live="polite"></p>
+            <p id="sizeError" class="hint !text-ink font-medium hidden" role="alert">Elegí un talle para continuar.</p>
+          </fieldset>
+        <% } %>
+
         <% if (product.stock > 0) { %>
           <button class="btn btn-primary btn-lg btn-block add-to-cart-btn"
                   data-product-id="<%= product.id %>"
                   data-product-name="<%= product.name %>"
                   data-product-price="<%= product.price %>"
-                  data-product-image="<%= productImg(product.image) %>">
+                  data-product-image="<%= gallery[0] %>"
+                  <% if (variants.length) { %>data-needs-size="true"<% } %>>
             Agregar al bolso
           </button>
         <% } else { %>
@@ -65,5 +97,22 @@
   </main>
 
   <%- include('../partials/footer') %>
+  <script>
+    // Stock del talle elegido
+    document.querySelectorAll('#sizePicker input').forEach(input => input.addEventListener('change', () => {
+      const n = Number(input.dataset.stock);
+      document.getElementById('sizeStock').textContent = n < 5 ? `¡Quedan ${n}!` : 'Disponible';
+    }));
+
+    // Galería: al tocar una miniatura, la foto principal cambia con un fundido
+    const mainImage = document.getElementById('mainImage');
+    document.querySelectorAll('.thumb').forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        document.querySelectorAll('.thumb').forEach(t => t.setAttribute('aria-current', t === thumb));
+        mainImage.classList.add('is-swapping');
+        setTimeout(() => { mainImage.src = thumb.dataset.src; mainImage.classList.remove('is-swapping'); }, 200);
+      });
+    });
+  </script>
 </body>
 </html>

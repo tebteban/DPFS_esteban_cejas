@@ -6,6 +6,11 @@ const auth = require('../middlewares/adminAuthMiddleware');
 const { createProductValidation, updateProductValidation } = require('../validations/productValidations');
 
 module.exports = (upload) => {
+  // Foto principal + hasta 6 fotos de galería; req.file queda como antes para la validación y el controlador
+  const productUploads = [
+    upload.fields([{ name: 'productImage', maxCount: 1 }, { name: 'galleryImages', maxCount: 6 }]),
+    (req, res, next) => { req.file = req.files?.productImage?.[0]; next(); }
+  ];
 
   // --- RUTAS PÚBLICAS ---
   router.get('/', productsController.getProducts);
@@ -16,7 +21,7 @@ module.exports = (upload) => {
   router.post(
     '/createProduct',
     auth,
-    upload.single('productImage'),
+    productUploads,
     createProductValidation,
     productsController.postCreateProduct
   );
@@ -25,7 +30,7 @@ module.exports = (upload) => {
   router.post(
     '/editProduct/:id',
     auth,
-    upload.single('productImage'),
+    productUploads,
     updateProductValidation,
     productsController.postEditProduct
   );

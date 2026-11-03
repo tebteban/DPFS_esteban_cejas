@@ -5,7 +5,7 @@ const usersController = require('../controllers/usersController');
 const upload = require('../middlewares/multerUsers');
 const guest = require('../middlewares/guestMiddleware');
 const auth = require('../middlewares/authMiddleware');
-const { registerValidation, loginValidation } = require('../validations/userValidations');
+const { registerValidation, loginValidation, profileValidation } = require('../validations/userValidations');
 
 // Registro
 router.get('/register', guest, usersController.register);
@@ -17,6 +17,8 @@ router.post('/login', guest, loginValidation, usersController.loginProcess);
 
 // Perfil y logout
 router.get('/profile', auth, usersController.profile);
+router.get('/profile/edit', auth, usersController.editProfile);
+router.post('/profile/edit', auth, upload.single('image'), profileValidation, usersController.updateProfile);
 router.get('/logout', usersController.logout);
 
 module.exports = router;

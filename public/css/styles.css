@@ -117,3 +117,83 @@ body {
 .link-mute:hover { color: var(--ink); text-decoration: underline; }
 .footer-link { color: var(--mute); text-decoration: none; }
 .footer-link:hover { color: #fff; }
+
+/* ---------- Animaciones ---------- */
+
+/* Aparición al hacer scroll (la clase .is-visible la pone un IntersectionObserver en footer.ejs) */
+/* Solo se oculta si hay JS (clase .js en <html>, la pone head.ejs), así sin JS el contenido se ve igual */
+.js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
+.js .reveal.is-visible { opacity: 1; transform: none; }
+
+/* Header: sombra suave cuando la página bajó */
+header.is-scrolled { box-shadow: var(--shadow-1); border-color: transparent; }
+
+/* Tarjeta de producto: zoom de la foto y botón que se levanta */
+.product-card .product-media img { transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
+.product-card:hover .product-media img { transform: scale(1.06); }
+.product-card .product-media img.img-hover { position: absolute; inset: 0; opacity: 0; background: var(--canvas-softer); transition: opacity .4s ease, transform .5s cubic-bezier(.2, .7, .2, 1); }
+.product-card:hover .product-media img.img-hover { opacity: 1; }
+
+/* Selector de talle */
+.size-option input { position: absolute; opacity: 0; pointer-events: none; }
+.size-option span { display: inline-flex; align-items: center; justify-content: center; min-width: 48px; height: 44px; padding: 0 14px; border-radius: 999px; background: var(--canvas-soft); font-weight: 500; cursor: pointer; transition: background-color .15s, color .15s; }
+.size-option span:hover { background: var(--pressed); }
+.size-option input:checked + span { background: var(--ink); color: #fff; }
+.size-option input:disabled + span { color: var(--mute); text-decoration: line-through; cursor: not-allowed; background: var(--canvas-softer); }
+.size-option input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Galería del detalle */
+.thumb { width: 72px; height: 72px; border-radius: 12px; background: var(--canvas-softer); padding: 6px; border: 2px solid transparent; cursor: pointer; transition: border-color .15s; }
+.thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.thumb[aria-current="true"] { border-color: var(--ink); }
+.fade-swap { transition: opacity .25s ease; }
+.fade-swap.is-swapping { opacity: 0; }
+@keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.shake { animation: shake .3s; }
+.product-card .add-to-cart-btn { transition: background-color .15s, color .15s, transform .2s; }
+.product-card .add-to-cart-btn:hover { background: var(--ink); color: #fff; transform: translateY(-2px); }
+.btn:active { transform: scale(.97); }
+
+/* Slider de portada */
+.hero-slider { position: relative; overflow: hidden; border-radius: 16px; background: var(--ink); }
+.hero-slide { position: absolute; inset: 0; opacity: 0; visibility: hidden; transition: opacity .8s ease, visibility .8s; }
+.hero-slide.is-active { position: relative; opacity: 1; visibility: visible; }
+.hero-slide .hero-copy > * { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.hero-slide.is-active .hero-copy > * { opacity: 1; transform: none; }
+.hero-slide.is-active .hero-copy > *:nth-child(2) { transition-delay: .1s; }
+.hero-slide.is-active .hero-copy > *:nth-child(3) { transition-delay: .2s; }
+.hero-slide.is-active .hero-copy > *:nth-child(4) { transition-delay: .3s; }
+.hero-slide .hero-img { transition: transform 7s ease-out; transform: scale(1.08); }
+.hero-slide.is-active .hero-img { transform: scale(1); }
+.hero-dot { width: 28px; height: 4px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, .4); cursor: pointer; transition: width .3s, background .3s; }
+.hero-dot.is-active { width: 48px; background: #fff; }
+.hero-dot:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+/* Carrusel horizontal con snap */
+.carousel { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; padding-bottom: 4px; }
+.carousel::-webkit-scrollbar { display: none; }
+.carousel > * { scroll-snap-align: start; }
+@media (min-width: 640px) { .carousel { grid-auto-columns: calc((100% - 24px) / 2); } }
+@media (min-width: 1024px) { .carousel { grid-auto-columns: calc((100% - 72px) / 4); } }
+
+/* Franja con texto en movimiento */
+.marquee { overflow: hidden; background: var(--ink); color: #fff; }
+.marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+.marquee-track span { padding: 14px 24px; font-weight: 700; font-size: 18px; white-space: nowrap; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Tarjeta de colección con etiqueta pill flotante */
+.collection-card { position: relative; display: block; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; background: var(--canvas-softer); }
+.collection-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+.collection-card:hover img { transform: scale(1.06); }
+.collection-card .btn-floating { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); transition: background-color .15s, color .15s; }
+.collection-card:hover .btn-floating { background: var(--ink); color: #fff; }
+
+/* "Reducir movimiento" (Windows con efectos de animación apagados): sin desplazamientos ni zoom, pero con fundidos suaves */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; }
+  .js .reveal, .hero-slide .hero-copy > *, .hero-slide .hero-img, .product-card:hover .product-media img,
+  .product-card .product-media img.img-hover, .collection-card:hover img, .product-card .add-to-cart-btn:hover, .btn:active { transform: none !important; }
+  .marquee-track { width: auto; justify-content: center; flex-wrap: wrap; }
+  .marquee-track span:nth-child(n+11) { display: none; } /* la segunda copia solo sirve para el loop */
+}

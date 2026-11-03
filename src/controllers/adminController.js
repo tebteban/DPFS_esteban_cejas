@@ -45,10 +45,13 @@ const adminController = {
 
     getDashboard: async (req, res) => {
         try {
-            const products = await db.Product.findAll({
-                include: ['category', 'brand']
-            });
-            res.render('admin/dashboard', { products });
+            const [products, orders, withdrawals] = await Promise.all([
+                db.Product.findAll({ include: ['category', 'brand', 'variants'], order: [['id', 'ASC'], [{ model: db.ProductVariant, as: 'variants' }, 'id', 'ASC']] }),
+                // shortcut: muestra los últimos 50; agregar paginación cuando haya muchos pedidos
+                db.Order.findAll({ include: ['items', 'user'], order: [['createdAt', 'DESC']], limit: 50 }),
+                db.WithdrawalRequest.findAll({ order: [['createdAt', 'DESC']], limit: 50 })
+            ]);
+            res.render('admin/dashboard', { products, orders, withdrawals });
         } catch (error) {
             console.error(error);
             res.send('Error cargando el dashboard');

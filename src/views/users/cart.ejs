@@ -1,3 +1,7 @@
+<%
+  const provincias = ['Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes', 'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones', 'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe', 'Santiago del Estero', 'Tierra del Fuego', 'Tucumán'];
+  const fullName = locals.user ? `${user.firstName} ${user.lastName}` : '';
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,10 +14,52 @@
     <main class="flex-grow max-w-container w-full mx-auto px-4 md:px-8 py-10 md:py-14">
         <h1 class="display-xl mb-8">Tu pedido</h1>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            <div id="cart-content" class="lg:col-span-2 space-y-4 min-w-0"></div>
+        <form id="checkoutForm" action="/checkout" method="POST" class="mp-checkout-form grid grid-cols-1 lg:grid-cols-3 gap-8 items-start hidden">
+            <input type="hidden" name="cart">
 
-            <aside id="cart-summary" class="card-elevated hidden">
+            <div class="lg:col-span-2 space-y-8 min-w-0">
+                <div id="cart-content" class="space-y-4"></div>
+
+                <section class="card-soft md:!p-8">
+                    <h2 class="display-sm mb-1">Datos de envío</h2>
+                    <p class="text-sm text-body mb-6">Enviamos a todo el país. El costo del envío lo coordinamos con vos después de la compra.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="label" for="shipping_name">Nombre y apellido</label>
+                            <input class="input" id="shipping_name" name="shipping_name" value="<%= fullName %>" autocomplete="name" required maxlength="100">
+                        </div>
+                        <div>
+                            <label class="label" for="shipping_phone">Teléfono</label>
+                            <input class="input" id="shipping_phone" name="shipping_phone" type="tel" placeholder="11 2345 6789" autocomplete="tel" required maxlength="30">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="label" for="shipping_address">Dirección</label>
+                            <input class="input" id="shipping_address" name="shipping_address" placeholder="Calle, número, piso y depto." autocomplete="street-address" required maxlength="150">
+                        </div>
+                        <div>
+                            <label class="label" for="shipping_city">Ciudad</label>
+                            <input class="input" id="shipping_city" name="shipping_city" autocomplete="address-level2" required maxlength="80">
+                        </div>
+                        <div>
+                            <label class="label" for="shipping_province">Provincia</label>
+                            <select class="input" id="shipping_province" name="shipping_province" autocomplete="address-level1" required>
+                                <option value="" disabled selected>Elegí tu provincia</option>
+                                <% provincias.forEach(p => { %><option><%= p %></option><% }) %>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="label" for="shipping_zip">Código postal</label>
+                            <input class="input" id="shipping_zip" name="shipping_zip" autocomplete="postal-code" required maxlength="10">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="label" for="shipping_notes">Aclaraciones (opcional)</label>
+                            <textarea class="input" id="shipping_notes" name="shipping_notes" rows="2" maxlength="500" placeholder="Horarios, entre calles, etc."></textarea>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="card-elevated lg:sticky lg:top-24">
                 <h2 class="display-sm mb-6">Resumen</h2>
                 <div class="flex justify-between text-body mb-2">
                     <span>Subtotal</span>
@@ -27,11 +73,15 @@
                     <span class="font-medium">Total</span>
                     <span id="cart-total" class="display-md">$0.00</span>
                 </div>
-                <button onclick="enviarPedidoWhatsApp()" class="btn btn-primary btn-lg btn-block mt-6">
-                    Enviar pedido por WhatsApp
+                <button type="submit" class="btn btn-primary btn-lg btn-block mt-6 !whitespace-normal text-center">
+                    <span class="material-icons-outlined">credit_card</span> Pagar con Mercado Pago
+                </button>
+                <p class="hint text-center">Tarjeta de crédito, débito o dinero en cuenta.</p>
+                <button type="button" onclick="enviarPedidoWhatsApp()" class="btn btn-subtle btn-block mt-4">
+                    Prefiero pedir por WhatsApp
                 </button>
             </aside>
-        </div>
+        </form>
 
         <div id="empty-cart-message" class="card-soft md:!p-8 text-center hidden">
             <p class="display-sm mb-2">Todavía no agregaste productos</p>
@@ -46,24 +96,23 @@
         document.addEventListener('DOMContentLoaded', loadCart);
 
         const escapeHtml = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const readCart = () => JSON.parse(localStorage.getItem('cart')) || [];
+        const saveCart = (cart) => { localStorage.setItem('cart', JSON.stringify(cart)); loadCart(); };
 
         function loadCart() {
             const cartContentDiv = document.getElementById('cart-content');
-            const cartSummaryDiv = document.getElementById('cart-summary');
-            const emptyCartMessageDiv = document.getElementById('empty-cart-message');
-
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cart = readCart();
             let totalSubtotal = 0;
 
             cartContentDiv.innerHTML = '';
-            emptyCartMessageDiv.classList.toggle('hidden', cart.length > 0);
-            cartSummaryDiv.classList.toggle('hidden', cart.length === 0);
+            document.getElementById('empty-cart-message').classList.toggle('hidden', cart.length > 0);
+            document.getElementById('checkoutForm').classList.toggle('hidden', cart.length === 0);
             if (cart.length === 0) return;
 
-            cart.forEach(item => {
+            // Las líneas se identifican por posición: el mismo producto puede estar en dos talles
+            cart.forEach((item, index) => {
                 const itemTotal = item.price * item.quantity;
                 totalSubtotal += itemTotal;
-                const id = escapeHtml(item.id);
 
                 cartContentDiv.insertAdjacentHTML('beforeend', `
                     <div class="card-soft !p-4 flex items-center gap-4">
@@ -73,12 +122,12 @@
                         </div>
                         <div class="flex-grow min-w-0">
                             <h3 class="font-medium">${escapeHtml(item.name)}</h3>
-                            <p class="text-sm text-body">$${item.price.toFixed(2)} c/u · <span class="sm:hidden font-medium text-ink">$${itemTotal.toFixed(2)}</span></p>
+                            <p class="text-sm text-body">${item.size ? 'Talle ' + escapeHtml(item.size) + ' · ' : ''}$${item.price.toFixed(2)} c/u · <span class="sm:hidden font-medium text-ink">$${itemTotal.toFixed(2)}</span></p>
                             <div class="flex flex-wrap items-center gap-3 mt-3">
-                                <label for="quantity-${id}" class="text-sm text-body">Cant.</label>
-                                <input type="number" id="quantity-${id}" value="${item.quantity}" min="1"
-                                       class="input !w-20 !py-1.5 !bg-white text-center quantity-input" data-product-id="${id}">
-                                <button class="btn btn-secondary !min-h-0 !py-1.5 text-sm remove-item-btn" data-product-id="${id}">Quitar</button>
+                                <label for="quantity-${index}" class="text-sm text-body">Cant.</label>
+                                <input type="number" id="quantity-${index}" value="${item.quantity}" min="1" max="99"
+                                       class="input !w-20 !py-1.5 !bg-white text-center quantity-input" data-index="${index}">
+                                <button type="button" class="btn btn-secondary !min-h-0 !py-1.5 text-sm remove-item-btn" data-index="${index}">Quitar</button>
                             </div>
                         </div>
                         <p class="display-sm shrink-0 hidden sm:block">$${itemTotal.toFixed(2)}</p>
@@ -90,37 +139,26 @@
             document.getElementById('cart-total').textContent = `$${totalSubtotal.toFixed(2)}`;
 
             document.querySelectorAll('.remove-item-btn').forEach(button => {
-                button.addEventListener('click', (event) => removeItemFromCart(event.currentTarget.dataset.productId));
+                button.addEventListener('click', () => {
+                    const cart = readCart();
+                    cart.splice(button.dataset.index, 1);
+                    saveCart(cart);
+                });
             });
 
             document.querySelectorAll('.quantity-input').forEach(input => {
-                input.addEventListener('change', (event) => {
-                    const productId = event.target.dataset.productId;
-                    const newQuantity = parseInt(event.target.value);
-                    if (newQuantity >= 1) updateQuantityInCart(productId, newQuantity);
-                    else removeItemFromCart(productId);
+                input.addEventListener('change', () => {
+                    const cart = readCart();
+                    const quantity = parseInt(input.value);
+                    if (quantity >= 1) cart[input.dataset.index].quantity = Math.min(quantity, 99);
+                    else cart.splice(input.dataset.index, 1);
+                    saveCart(cart);
                 });
             });
         }
 
-        function removeItemFromCart(productId) {
-            const cart = (JSON.parse(localStorage.getItem('cart')) || []).filter(item => item.id !== productId);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            loadCart();
-        }
-
-        function updateQuantityInCart(productId, newQuantity) {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
-            const item = cart.find(item => item.id === productId);
-            if (item) {
-                item.quantity = newQuantity;
-                localStorage.setItem('cart', JSON.stringify(cart));
-                loadCart();
-            }
-        }
-
         function enviarPedidoWhatsApp() {
-            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cart = readCart();
             if (cart.length === 0) return;
 
             const numeroWhatsApp = "5493854996011";
@@ -130,7 +168,7 @@
             cart.forEach(item => {
                 const itemTotal = item.price * item.quantity;
                 total += itemTotal;
-                mensaje += `- ${item.quantity}x ${item.name} ($${itemTotal.toFixed(2)})\n`;
+                mensaje += `- ${item.quantity}x ${item.name}${item.size ? ' (talle ' + item.size + ')' : ''} ($${itemTotal.toFixed(2)})\n`;
             });
 
             mensaje += `\n*TOTAL: $${total.toFixed(2)}*\n\n`;
