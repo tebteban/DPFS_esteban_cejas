@@ -34,7 +34,7 @@ const baseProductValidation = [
 const validateImage = (isOptional = false) => body('productImage').custom((value, { req }) => {
   if (!req.file || !req.file.originalname) {
     if (isOptional) return true;
-    throw new Error('Debes subir una imagen del producto.');
+    throw new Error('Debes subir una imagen del producto (JPG, PNG o WEBP, hasta 2MB).');
   }
 
   const ext = path.extname(req.file.originalname).toLowerCase();

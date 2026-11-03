@@ -1,5 +1,5 @@
 const { Product, Category, Brand } = require('../../../models');
-const baseUrl = 'http://localhost:3000';
+const baseUrl = process.env.APP_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 module.exports = {
   // GET /api/products
@@ -48,7 +48,7 @@ module.exports = {
         stock: product.stock,
         category: product.category ? product.category.name : null,
         brand: product.brand ? product.brand.name : null,
-        image_url: `${baseUrl}${product.image}`,
+        image_url: product.image?.startsWith('/') ? `${baseUrl}${product.image}` : null,
         createdAt: product.createdAt,
         updatedAt: product.updatedAt
       });

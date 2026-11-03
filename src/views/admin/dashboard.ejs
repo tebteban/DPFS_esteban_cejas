@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Panel admin - Zona 6</title>
+</head>
+<body class="flex flex-col min-h-screen">
+    <%- include('../partials/header') %>
+
+    <%
+        const totalProducts = products.length;
+        const lowStockCount = products.filter(p => p.stock < 5).length;
+        const totalValue = products.reduce((acc, p) => acc + (p.price * p.stock), 0);
+        const chartData = products.map(p => ({ name: p.name, stock: p.stock, category: p.category ? p.category.name : 'Sin categoría' }));
+    %>
+
+    <main class="flex-grow max-w-container w-full mx-auto px-4 md:px-8 py-10 md:py-14">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+                <p class="eyebrow mb-1">Administración</p>
+                <h1 class="display-xl">Panel de control</h1>
+            </div>
+            <div class="flex gap-3">
+                <a href="/admin/logout" class="btn btn-secondary">Salir</a>
+                <a href="/productos/createProduct" class="btn btn-primary">
+                    <span class="material-icons-outlined text-xl">add</span> Nuevo producto
+                </a>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card-soft">
+                <p class="text-sm text-body mb-1">Total de productos</p>
+                <p class="display-lg"><%= totalProducts %></p>
+            </div>
+            <div class="<%= lowStockCount > 0 ? 'card-dark' : 'card-soft' %>">
+                <p class="text-sm <%= lowStockCount > 0 ? 'text-mute' : 'text-body' %> mb-1">Stock crítico (menos de 5)</p>
+                <p class="display-lg"><%= lowStockCount %></p>
+            </div>
+            <div class="card-soft">
+                <p class="text-sm text-body mb-1">Valor de inventario</p>
+                <p class="display-lg">$<%= Number(totalValue).toLocaleString('es-AR', { minimumFractionDigits: 2 }) %></p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="card-soft">
+                <h2 class="display-sm mb-4">Stock por producto</h2>
+                <div class="h-64"><canvas id="stockChart" aria-label="Gráfico de stock por producto" role="img"></canvas></div>
+            </div>
+            <div class="card-soft">
+                <h2 class="display-sm mb-4">Productos por categoría</h2>
+                <div class="h-64"><canvas id="categoryChart" aria-label="Gráfico de productos por categoría" role="img"></canvas></div>
+            </div>
+        </div>
+
+        <h2 class="display-md mb-4">Inventario</h2>
+        <div class="rounded-2xl overflow-x-auto border border-canvas-soft">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Categoría</th>
+                        <th class="!text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (products.length > 0) { %>
+                        <% products.forEach(product => { %>
+                            <tr>
+                                <td>
+                                    <a href="/productos/<%= product.id %>" class="flex items-center gap-3 min-w-[220px]">
+                                        <img class="h-10 w-10 object-contain rounded-lg bg-canvas-softer p-1" src="<%= productImg(product.image) %>"
+                                             onerror="this.onerror=null;this.src='/img/products/default.svg'" alt="">
+                                        <span class="font-medium"><%= product.name %></span>
+                                    </a>
+                                </td>
+                                <td class="whitespace-nowrap">$<%= Number(product.price).toFixed(2) %></td>
+                                <td>
+                                    <span class="chip !py-1 <%= product.stock < 5 ? 'chip-active' : '' %>">
+                                        <%= product.stock > 0 ? product.stock + ' disp.' : 'Agotado' %>
+                                    </span>
+                                </td>
+                                <td class="text-body"><%= product.category ? product.category.name : 'N/A' %></td>
+                                <td>
+                                    <div class="flex justify-end gap-2">
+                                        <a href="/productos/editProduct/<%= product.id %>" class="btn btn-subtle !min-h-0 !py-1.5 text-sm">Editar</a>
+                                        <form action="/productos/deleteProduct/<%= product.id %>" method="POST" onsubmit="return confirm('¿Eliminar este producto?')">
+                                            <button type="submit" class="btn btn-secondary !min-h-0 !py-1.5 text-sm">Eliminar</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    <% } else { %>
+                        <tr><td colspan="5" class="!py-8 text-center text-body">No hay productos cargados</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        // "<" escapado para que un nombre de producto con etiquetas HTML no cierre este script
+        const products = <%- JSON.stringify(chartData).replace(/</g, '\\u003c') %>;
+
+        if (products.length > 0) {
+            Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+            Chart.defaults.color = '#5e5e5e';
+
+            new Chart(document.getElementById('stockChart'), {
+                type: 'bar',
+                data: {
+                    labels: products.map(p => p.name),
+                    datasets: [{
+                        label: 'Unidades en stock',
+                        data: products.map(p => p.stock),
+                        // Stock crítico en negro, el resto en gris
+                        backgroundColor: products.map(p => p.stock < 5 ? '#000000' : '#afafaf'),
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e2e2e2' } },
+                        x: { grid: { display: false }, ticks: { display: false } }
+                    }
+                }
+            });
+
+            const categoryCounts = {};
+            products.forEach(p => { categoryCounts[p.category] = (categoryCounts[p.category] || 0) + 1; });
+
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryCounts),
+                    datasets: [{
+                        data: Object.values(categoryCounts),
+                        backgroundColor: ['#000000', '#5e5e5e', '#afafaf', '#e2e2e2', '#282828', '#4b4b4b'],
+                        borderWidth: 2,
+                        borderColor: '#efefef'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right' } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -4,61 +4,73 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('products', [
       {
-        name: 'Pelota de Vóley Mikasa V200W',
-        description: 'Pelota oficial de competiciones FIVB. Superficie de microfibra con 18 paneles aerodinámicos.',
-        price: 39999.99,
-        stock: 25,
-        image: '/img/mikasa-v200w.jpg',
-        category_id: 2, // Pelotas
-        brand_id: 1, // Mikasa
-        user_id: 1, // Usuario creador
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Pelota de Entrenamiento Molten V5M5000',
-        description: 'Balón profesional de entrenamiento, construcción resistente y agarre óptimo.',
-        price: 28999.99,
-        stock: 30,
-        image: '/img/molten-v5m5000.jpg',
-        category_id: 2, // Pelotas
-        brand_id: 2, // Molten
+        name: 'Remera Z6 Match Oficial',
+        description: 'Camiseta de juego con cuello en V anatómico y corte de sisa raglán corrida. Elimina costuras sobre la articulación para una batida limpia.',
+        price: 25900.00,
+        stock: 50,
+        image: '/img/products/nike-camiseta.jpg',
+        category_id: 1, // Indumentaria
+        brand_id: 1, // Zona 6
         user_id: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        name: 'Zapatillas Nike Volley Zoom HyperAce 2',
-        description: 'Zapatillas diseñadas para jugadoras de vóley. Excelente amortiguación y agarre.',
-        price: 59999.99,
-        stock: 12,
-        image: '/img/nike-hyperace.jpg',
-        category_id: 3, // Calzado
-        brand_id: 4, // Nike
-        user_id: 1,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Rodillera Profesional Adidas Elite',
-        description: 'Protección avanzada para rodillas, con ajuste ergonómico y ventilación.',
-        price: 14999.99,
+        name: 'Calzas Z6 Slide',
+        description: 'Laterales de cadera y muslos confeccionados con poliamida y elastano de alta densidad. Diseñadas para soportar el deslizamiento sobre parquet o sintético sin desgarrarse.',
+        price: 22500.00,
         stock: 40,
-        image: '/img/adidas-rodillera.jpg',
-        category_id: 4, // Accesorios
-        brand_id: 5, // Adidas
+        image: '/img/products/calza.png',
+        category_id: 1, // Indumentaria
+        brand_id: 1, // Zona 6
         user_id: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
-        name: 'Red de Competición Profesional',
-        description: 'Red de vóley con tensores de acero y bordes reforzados, ideal para torneos oficiales.',
-        price: 74999.99,
-        stock: 10,
-        image: '/img/red-profesional.jpg',
-        category_id: 5, // Equipamiento Deportivo
-        brand_id: 3, // Wilson
+        name: 'Buzo Térmico Z6 Baseline',
+        description: 'Buzo térmico half-zip con calce entallado pensado para traslados y descansos entre sets.',
+        price: 45000.00,
+        stock: 20,
+        image: '/img/products/manga.jpg',
+        category_id: 1,
+        brand_id: 1,
+        user_id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Rodilleras Z6 Defensor',
+        description: 'Protección integral y compacta. Espuma de alta densidad para máxima absorción de impacto sin perder movilidad.',
+        price: 18000.00,
+        stock: 60,
+        image: '/img/products/rodillera.jpg',
+        category_id: 2, // Rodilleras
+        brand_id: 1,
+        user_id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Bolso Z6 Pro Tour',
+        description: 'Bolso amplio para todo tu equipamiento. Compartimento especial para zapatillas y ropa húmeda.',
+        price: 55000.00,
+        stock: 15,
+        image: 'default.jpg',
+        category_id: 3, // Bolsos
+        brand_id: 1,
+        user_id: 1,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Medias de Compresión Z6',
+        description: 'Medias largas con ajuste en tobillo y arco. Previenen calambres y mejoran la circulación durante el partido.',
+        price: 8500.00,
+        stock: 100,
+        image: 'default.jpg',
+        category_id: 4, // Medias
+        brand_id: 1,
         user_id: 1,
         createdAt: new Date(),
         updatedAt: new Date()

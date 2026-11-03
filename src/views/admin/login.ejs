@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head') %>
+    <title>Acceso admin - Zona 6</title>
+</head>
+<body class="flex flex-col min-h-screen bg-canvas-soft">
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="card-elevated md:!p-8 max-w-md w-full">
+            <img src="/img/logo.png" alt="Zona 6" class="h-10 w-auto rounded-md mb-6">
+            <h1 class="display-lg mb-2">Panel de control</h1>
+            <p class="text-body mb-6">Acceso exclusivo para administradores.</p>
+
+            <%- include('../partials/errors') %>
+
+            <form class="space-y-5" action="/admin/login" method="POST">
+                <div>
+                    <label class="label" for="username">Usuario o email</label>
+                    <input class="input" id="username" type="text" name="username" placeholder="admin@zona6.com" autocomplete="username" required/>
+                </div>
+                <div>
+                    <label class="label" for="password">Contraseña</label>
+                    <input class="input" id="password" type="password" name="password" placeholder="Contraseña" autocomplete="current-password" required/>
+                </div>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Ingresar</button>
+            </form>
+            <p class="text-center mt-6"><a href="/" class="link-mute text-sm">Volver a la tienda</a></p>
+        </div>
+    </main>
+</body>
+</html>

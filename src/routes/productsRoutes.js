@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/productsController');
-const auth = require('../middlewares/authMiddleware');
+// Crear/editar/borrar productos es solo para administradores
+const auth = require('../middlewares/adminAuthMiddleware');
 const { createProductValidation, updateProductValidation } = require('../validations/productValidations');
 
 module.exports = (upload) => {

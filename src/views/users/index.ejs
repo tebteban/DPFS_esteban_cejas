@@ -1,80 +1,81 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Spikeshop - Tu Tienda de Voleibol de Élite</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <style>
-        body { font-family: 'Poppins', sans-serif; 
-    }
-    </style>
+    <%- include('../partials/head') %>
+    <title>Zona 6 // Indumentaria Deportiva de Diseño</title>
 </head>
 <body class="flex flex-col min-h-screen">
     <%- include('../partials/header') %>
 
     <main class="flex-grow">
-        <section class="py-16 md:py-24 bg-gray-50 hero-section">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid md:grid-cols-2 gap-16 items-center">
-                    <div class="space-y-6 text-center md:text-left">
-                        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 leading-tight">
-                            MEJORA TU JUEGO CON <span class="text-cyan-500">SPIKESHOP</span>
-                        </h1>
-                        <p class="text-gray-600 text-lg">
-                            Descubre equipo de voleibol de alta calidad, diseñado para campeones. ¡Compra ahora y lleva tu rendimiento al siguiente nivel!
-                        </p>
-                        <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
-                            <a class="px-8 py-3 bg-cyan-500 text-white rounded-full hover:bg-cyan-600 transition-colors shadow-lg text-lg font-semibold" href="/productos">Comprar Ahora</a>
-                        </div>
+        <section class="max-w-container mx-auto px-4 md:px-8 py-12 md:py-20">
+            <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+                <div class="space-y-6">
+                    <p class="eyebrow">Vóley indoor · Posición 6</p>
+                    <h1 class="display-xxl">El juego empieza abajo.</h1>
+                    <p class="text-lg font-medium text-body max-w-lg">
+                        El ataque gana puntos; la defensa gana partidos. Zona 6 nace en el fondo de la cancha, donde no hay segundas oportunidades y cada pelota se pelea contra el piso.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <a class="btn btn-primary btn-lg" href="/productos">Ver colección</a>
+                        <a class="btn btn-subtle btn-lg" href="#lineas">Conocer las líneas</a>
                     </div>
-                    <div>
-                        <div class="relative">
-                            <img alt="Jugadores de voleibol de la selección argentina celebrando un punto" class="rounded-lg shadow-2xl w-full h-auto" src="/img/equipo.jpg"/>
-                        </div>
-                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden aspect-[4/3] bg-canvas-soft">
+                    <img alt="Equipo de vóley en defensa" class="w-full h-full object-cover grayscale" src="/img/equipo.jpg"/>
                 </div>
             </div>
         </section>
 
-        <section class="py-16 bg-gray-100">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-4xl font-bold text-gray-800 text-center mb-12">¿Por qué elegir Spikeshop?</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                    <div class="p-8 rounded-lg shadow-lg bg-white transform hover:scale-105 transition-transform duration-300">
-                        <span class="material-icons text-6xl text-cyan-500 mb-4">local_shipping</span>
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-2">Envío Rápido</h3>
-                        <p class="text-gray-600 text-lg">Recibe tus productos en tiempo récord para que vuelvas a la cancha sin demoras.</p>
-                    </div>
-                    <div class="p-8 rounded-lg shadow-lg bg-white transform hover:scale-105 transition-transform duration-300">
-                        <span class="material-icons text-6xl text-cyan-500 mb-4">military_tech</span>
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-2">Calidad Garantizada</h3>
-                        <p class="text-gray-600 text-lg">Solo trabajamos con las mejores marcas para asegurar tu máximo rendimiento.</p>
-                    </div>
-                    <div class="p-8 rounded-lg shadow-lg bg-white transform hover:scale-105 transition-transform duration-300">
-                        <span class="material-icons text-6xl text-cyan-500 mb-4">support_agent</span>
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-2">Atención Personalizada</h3>
-                        <p class="text-gray-600 text-lg">Nuestro equipo de expertos está listo para asesorarte en cada paso.</p>
-                    </div>
+        <section id="lineas" class="max-w-container mx-auto px-4 md:px-8 pb-16">
+            <h2 class="display-xl mb-2">Lectura y respuesta</h2>
+            <p class="text-body mb-8 max-w-2xl">Vestimenta técnica pensada para resistir la fricción y responder al instante.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="card-soft space-y-2">
+                    <span class="material-icons-outlined text-3xl">shield</span>
+                    <h3 class="display-sm">Z6 Slide</h3>
+                    <p class="text-body">Shorts y calzas con entramado de poliamida y elastano de alta densidad para soportar el deslizamiento.</p>
+                    <a class="btn btn-secondary mt-2" href="/productos?categoria=1">Ver indumentaria</a>
+                </div>
+                <div class="card-soft space-y-2">
+                    <span class="material-icons-outlined text-3xl">bolt</span>
+                    <h3 class="display-sm">Z6 Match</h3>
+                    <p class="text-body">Camisetas de juego con corte de sisa raglán corrida para una batida de remate limpia y sin tirones.</p>
+                    <a class="btn btn-secondary mt-2" href="/productos?categoria=1">Ver camisetas</a>
+                </div>
+                <div class="card-soft space-y-2">
+                    <span class="material-icons-outlined text-3xl">local_fire_department</span>
+                    <h3 class="display-sm">Z6 Baseline</h3>
+                    <p class="text-body">Remeras de calentamiento livianas y buzos térmicos half-zip pensados para traslados y descansos.</p>
+                    <a class="btn btn-secondary mt-2" href="/productos">Ver todo</a>
                 </div>
             </div>
         </section>
 
-        <section class="py-16 bg-cyan-700 text-white text-center">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
-                <h2 class="text-4xl font-bold mb-4">¡No te pierdas ninguna novedad!</h2>
-                <p class="text-lg mb-8">Suscríbete a nuestro newsletter para recibir las últimas ofertas, noticias y consejos de voleibol directamente en tu bandeja de entrada.</p>
-                <form action="#" method="POST" class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <input type="email" placeholder="Ingresa tu email" class="p-3 rounded-md text-gray-800 w-full sm:w-2/3 focus:outline-none focus:ring-2 focus:ring-cyan-400" required>
-                    <button type="submit" class="px-6 py-3 bg-white text-cyan-700 rounded-md font-bold hover:bg-gray-200 transition-colors text-lg">Suscribirme</button>
+        <section class="max-w-container mx-auto px-4 md:px-8 pb-16">
+            <div class="card-dark md:!p-12 grid md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="display-lg mb-2">En cada pelota</h2>
+                    <p class="text-mute">Suscribite al newsletter y recibí las novedades de la colección.</p>
+                </div>
+                <form id="newsletterForm" class="flex flex-col sm:flex-row gap-3">
+                    <label for="newsletterEmail" class="sr-only">Email</label>
+                    <input id="newsletterEmail" type="email" placeholder="Tu email" class="input !bg-white" required>
+                    <button type="submit" class="btn btn-secondary shrink-0">Suscribirme</button>
                 </form>
+                <p id="newsletterOk" class="hidden md:col-start-2 text-sm">¡Gracias! Te vamos a escribir pronto.</p>
             </div>
         </section>
-
     </main>
 
     <%- include('../partials/footer') %>
+    <script>
+        // shortcut: el newsletter no se guarda en el servidor todavía; conectar a una ruta POST cuando exista
+        document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            e.target.reset();
+            document.getElementById('newsletterOk').classList.remove('hidden');
+        });
+    </script>
 </body>
 </html>

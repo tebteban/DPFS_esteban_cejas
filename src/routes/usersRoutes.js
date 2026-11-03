@@ -9,11 +9,11 @@ const { registerValidation, loginValidation } = require('../validations/userVali
 
 // Registro
 router.get('/register', guest, usersController.register);
-router.post('/register', upload.single('image'), registerValidation, usersController.store);
+router.post('/register', guest, upload.single('image'), registerValidation, usersController.store);
 
 // Login
 router.get('/login', guest, usersController.login);
-router.post('/login', loginValidation, usersController.loginProcess);
+router.post('/login', guest, loginValidation, usersController.loginProcess);
 
 // Perfil y logout
 router.get('/profile', auth, usersController.profile);

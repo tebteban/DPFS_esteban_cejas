@@ -1,118 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cargar Producto - Spikeshop</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-  <style>
-    body { font-family: 'Poppins', sans-serif; }
-    input[type="file"]::file-selector-button {
-      background-color: #38bdf8;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.375rem;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      margin-right: 1rem;
-    }
-    input[type="file"]::file-selector-button:hover { background-color: #06b6d4; }
-  </style>
+  <%- include('../partials/head') %>
+  <title><%= pageTitle %> - Zona 6</title>
 </head>
-<body class="bg-cyan-50">
-  <div class="min-h-screen flex flex-col">
-    <%- include('../partials/header') %>
+<body class="flex flex-col min-h-screen">
+  <%- include('../partials/header') %>
 
-    <main class="flex-grow flex items-center justify-center p-4 py-8">
-      <div class="bg-white rounded-lg p-8 max-w-2xl w-full shadow-lg">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Cargar Nuevo Producto</h2>
-
-        <% if (message) { %>
-          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            <strong class="font-bold">Error:</strong>
-            <span><%= message %></span>
-          </div>
-        <% } %>
-
-        <form action="/productos/createProduct" method="POST" enctype="multipart/form-data" class="space-y-6">
-
-          <!-- Nombre -->
-          <div>
-            <label for="productName" class="text-sm font-medium text-gray-700 block mb-1">Nombre del Producto</label>
-            <input id="productName" name="productName" type="text" placeholder="Ej: Balón Mikasa V200W" required
-              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
-              value="<%= oldData.productName || '' %>">
-          </div>
-
-          <!-- Descripción -->
-          <div>
-            <label for="description" class="text-sm font-medium text-gray-700 block mb-1">Descripción</label>
-            <textarea id="description" name="description" rows="4" placeholder="Descripción detallada del producto..." required
-              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"><%= oldData.description || '' %></textarea>
-          </div>
-
-          <!-- Precio y Stock -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="price" class="text-sm font-medium text-gray-700 block mb-1">Precio ($)</label>
-              <input id="price" name="price" type="number" step="0.01" min="0" placeholder="Ej: 14999" required
-                class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
-                value="<%= oldData.price || '' %>">
-            </div>
-            <div>
-              <label for="stock" class="text-sm font-medium text-gray-700 block mb-1">Stock</label>
-              <input id="stock" name="stock" type="number" min="0" placeholder="Ej: 25" required
-                class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500"
-                value="<%= oldData.stock || '' %>">
-            </div>
-          </div>
-
-          <!-- Categoría -->
-          <div>
-            <label for="category_id" class="text-sm font-medium text-gray-700 block mb-1">Categoría</label>
-            <select id="category_id" name="category_id" required
-              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
-              <option value="" disabled selected>Selecciona una categoría</option>
-              <% categories.forEach(cat => { %>
-                <option value="<%= cat.id %>" <%= oldData.category_id == cat.id ? 'selected' : '' %>>
-                  <%= cat.name %>
-                </option>
-              <% }) %>
-            </select>
-          </div>
-
-          <!-- Marca -->
-          <div>
-            <label for="brand_id" class="text-sm font-medium text-gray-700 block mb-1">Marca</label>
-            <select id="brand_id" name="brand_id" required
-              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
-              <option value="" disabled selected>Selecciona una marca</option>
-              <% brands.forEach(br => { %>
-                <option value="<%= br.id %>" <%= oldData.brand_id == br.id ? 'selected' : '' %>>
-                  <%= br.name %>
-                </option>
-              <% }) %>
-            </select>
-          </div>
-
-          <!-- Imagen -->
-          <div>
-            <label for="productImage" class="text-sm font-medium text-gray-700 block mb-1">Subir Imagen</label>
-            <input id="productImage" name="productImage" type="file" accept="image/*" required
-              class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:ring-2 focus:ring-cyan-500">
-            <p class="text-xs text-gray-500 mt-1">Formatos permitidos: JPG, PNG, SVG.</p>
-          </div>
-
-          <button type="submit" class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors">
-            Cargar Producto
-          </button>
-        </form>
-      </div>
-    </main>
-  </div>
+  <main class="flex-grow flex justify-center px-4 py-10 md:py-14">
+    <div class="card-soft md:!p-8 max-w-2xl w-full">
+      <h1 class="display-lg mb-6"><%= pageTitle %></h1>
+      <%- include('../partials/errors') %>
+      <%- include('../partials/productForm') %>
+    </div>
+  </main>
 
   <%- include('../partials/footer') %>
 </body>

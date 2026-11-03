@@ -4,8 +4,8 @@ const mainController = require('../controllers/mainController'); // Importamos e
 
 // Asociamos cada URL con su método correspondiente del controlador
 router.get('/', mainController.getHome);
-router.get('/login', mainController.getLogin);
-router.get('/register', mainController.getRegister);
+router.get('/login', (req, res) => res.redirect('/users/login'));
+router.get('/register', (req, res) => res.redirect('/users/register'));
 router.get('/cart', mainController.getCart);
 
 module.exports = router;

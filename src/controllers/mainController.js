@@ -4,17 +4,6 @@ const mainController = {
         res.render('users/index');
     },
 
-    // Lógica para la página de login
-    getLogin: (req, res) => {
-        const registrationSuccess = req.query.registrationSuccess === 'true';
-        res.render('users/login', { registrationSuccess });
-    },
-
-    // Lógica para la página de registro
-    getRegister: (req, res) => {
-        res.render('users/register', { message: null });
-    },
-
     // Lógica para la página del carrito
     getCart: (req, res) => {
         res.render('users/cart');

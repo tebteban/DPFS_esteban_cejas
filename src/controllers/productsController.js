@@ -17,10 +17,29 @@ const productsController = {
   // 📄 Listar todos los productos
   getProducts: async (req, res) => {
     try {
-      const products = await Product.findAll({ include: ['category', 'brand'] });
+      const { categoria, orden } = req.query;
+      let where = {};
+      if (categoria) where.category_id = categoria;
+
+      let order = [];
+      if (orden === 'precio_asc') order = [['price', 'ASC']];
+      if (orden === 'precio_desc') order = [['price', 'DESC']];
+
+      const products = await Product.findAll({ 
+        where,
+        order,
+        include: ['category', 'brand'] 
+      });
+      
+      const categories = await Category.findAll();
+
       res.render('users/productos', {
         products,
-        pageTitle: 'Todos los Productos'
+        categories,
+        currentCategory: categoria || '',
+        currentOrder: orden || '',
+        pageTitle: 'Catálogo Z6',
+        searchTerm: ''
       });
     } catch (error) {
       console.error('Error al listar productos:', error);
@@ -40,15 +59,25 @@ const productsController = {
       include: ['category', 'brand']
     });
 
+    const categories = await Category.findAll();
+
     if (products.length > 0) {
       return res.render('users/productos', {
         products,
-        pageTitle: `Resultados de búsqueda: "${searchTerm}"`
+        categories,
+        currentCategory: '',
+        currentOrder: '',
+        pageTitle: `Resultados para "${searchTerm}"`,
+        searchTerm
       });
     } else {
       return res.render('users/productos', {
         products: [],
-        pageTitle: `No se encontraron resultados para "${searchTerm}"`
+        categories,
+        currentCategory: '',
+        currentOrder: '',
+        pageTitle: `Sin resultados para "${searchTerm}"`,
+        searchTerm
       });
     }
   } catch (error) {
@@ -79,7 +108,6 @@ const productsController = {
         errors: [],
         oldData: {},
         categories,
-        message: null,
         brands
       });
     } catch (error) {
@@ -92,7 +120,8 @@ const productsController = {
   postCreateProduct: async (req, res) => {
       const errors = validationResult(req);
 
-      if (!errors.isEmpty()) {
+    if (!errors.isEmpty()) {
+      if (req.file) fs.unlinkSync(req.file.path); // no dejar imágenes huérfanas
       const { categories, brands } = await fetchFormData();
       return res.status(400).render('users/createProduct', {
         pageTitle: 'Cargar Nuevo Producto',
@@ -115,7 +144,7 @@ const productsController = {
         brand_id: parseInt(req.body.brand_id, 10),
         user_id: req.session.userLogged ? req.session.userLogged.id : null
       });
-      res.redirect('/productos');
+      res.redirect('/admin');
     } catch (error) {
       console.error('Error al crear producto:', error);
       res.status(500).render('users/error', { message: 'Error al guardar producto.' });
@@ -154,6 +183,7 @@ const productsController = {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      if (req.file) fs.unlinkSync(req.file.path); // no dejar imágenes huérfanas
       const { categories, brands } = await fetchFormData();
       return res.status(400).render('users/editProduct', {
         pageTitle: `Editar Producto: ${product.name}`,
@@ -184,7 +214,7 @@ const productsController = {
         image: imageUrl
       });
 
-      res.redirect('/productos');
+      res.redirect('/admin');
     } catch (error) {
       console.error(error);
       res.status(500).render('users/error', { message: 'Error al actualizar producto.' });
@@ -204,7 +234,7 @@ const productsController = {
       }
 
       await Product.destroy({ where: { id: req.params.id } });
-      res.redirect('/productos');
+      res.redirect('/admin');
     } catch (error) {
       console.error(error);
       res.status(500).render('users/error', { message: 'Error al eliminar producto.' });

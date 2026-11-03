@@ -1,0 +1,71 @@
+<%
+  // Formulario compartido por alta y edición: oldData (reenvío con errores) > product (edición) > vacío
+  const p = locals.product || {};
+  const old = locals.oldData || {};
+  const val = (field, fallback) => old[field] !== undefined ? old[field] : (fallback ?? '');
+  const isEdit = Boolean(locals.product);
+%>
+<form action="<%= isEdit ? '/productos/editProduct/' + p.id : '/productos/createProduct' %>" method="POST" enctype="multipart/form-data" class="space-y-5">
+  <div>
+    <label for="productName" class="label">Nombre del producto</label>
+    <input id="productName" name="productName" type="text" placeholder="Ej: Z6 Match Oficial" required
+           class="input" value="<%= val('productName', p.name) %>">
+  </div>
+
+  <div>
+    <label for="description" class="label">Descripción</label>
+    <textarea id="description" name="description" rows="4" placeholder="Descripción detallada del producto..." required
+              class="input"><%= val('description', p.description) %></textarea>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div>
+      <label for="price" class="label">Precio ($)</label>
+      <input id="price" name="price" type="number" step="0.01" min="0" placeholder="14999" required
+             class="input" value="<%= val('price', p.price) %>">
+    </div>
+    <div>
+      <label for="stock" class="label">Stock</label>
+      <input id="stock" name="stock" type="number" min="0" placeholder="25" required
+             class="input" value="<%= val('stock', p.stock) %>">
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div>
+      <label for="category_id" class="label">Categoría</label>
+      <select id="category_id" name="category_id" required class="input">
+        <option value="" disabled <%= val('category_id', p.category_id) === '' ? 'selected' : '' %>>Seleccioná una categoría</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>" <%= val('category_id', p.category_id) == cat.id ? 'selected' : '' %>><%= cat.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label for="brand_id" class="label">Marca</label>
+      <select id="brand_id" name="brand_id" required class="input">
+        <option value="" disabled <%= val('brand_id', p.brand_id) === '' ? 'selected' : '' %>>Seleccioná una marca</option>
+        <% brands.forEach(br => { %>
+          <option value="<%= br.id %>" <%= val('brand_id', p.brand_id) == br.id ? 'selected' : '' %>><%= br.name %></option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label for="productImage" class="label"><%= isEdit ? 'Nueva imagen (opcional)' : 'Imagen' %></label>
+    <% if (isEdit) { %>
+      <div class="flex items-center gap-4 mb-3">
+        <img src="<%= productImg(p.image) %>" alt="Imagen actual de <%= p.name %>" class="w-20 h-20 object-contain bg-white rounded-xl p-2">
+        <span class="text-sm text-body">Imagen actual</span>
+      </div>
+    <% } %>
+    <input id="productImage" name="productImage" type="file" accept="image/jpeg,image/png,image/webp" <%= isEdit ? '' : 'required' %> class="input"/>
+    <p class="hint">JPG, PNG o WEBP de hasta 2MB.</p>
+  </div>
+
+  <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
+    <a href="/admin" class="btn btn-secondary">Cancelar</a>
+    <button type="submit" class="btn btn-primary"><%= isEdit ? 'Guardar cambios' : 'Cargar producto' %></button>
+  </div>
+</form>

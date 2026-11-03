@@ -32,7 +32,7 @@ module.exports = {
         last_name: user.lastName,
         email: user.email,
         role: user.role,
-        image_url: `${baseUrl}${user.image}`
+        image_url: user.image?.startsWith('/') ? `${baseUrl}${user.image}` : null
       });
     } catch (error) {
       res.status(500).json({ error: 'Error interno del servidor', detail: error.message });

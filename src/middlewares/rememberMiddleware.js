@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
     return next();
   }
 
-  const rememberCookie = req.cookies?.rememberUser;
+  const rememberCookie = req.signedCookies?.rememberUser;
   const userId = Number(rememberCookie);
 
   if (!rememberCookie || Number.isNaN(userId)) {

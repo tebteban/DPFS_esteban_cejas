@@ -1,113 +1,57 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Registro - Spikeshop</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+    <%- include('../partials/head') %>
+    <title>Crear cuenta - Zona 6</title>
 </head>
-<body class="bg-cyan-50">
-    <div class="min-h-screen flex flex-col">
-        <%- include('../partials/header') %>
+<body class="flex flex-col min-h-screen">
+    <%- include('../partials/header') %>
 
-        <main class="flex-grow flex items-center justify-center p-4">
-            <div class="bg-white rounded-lg p-8 max-w-4xl w-full shadow-lg">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Crear Cuenta</h2>
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="card-soft md:!p-8 max-w-2xl w-full">
+            <h1 class="display-lg mb-2">Sumate a la banda</h1>
+            <p class="text-body mb-6">Creá tu cuenta para comprar más rápido.</p>
 
-                <% if (errors && errors.length) { %>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong class="font-bold block mb-1">Revisa los siguientes puntos:</strong>
-                        <ul class="list-disc ml-5 text-sm space-y-1">
-                            <% errors.forEach(error => { %>
-                                <li><%= error.msg %></li>
-                            <% }) %>
-                        </ul>
-                    </div>
-                <% } %>
+            <%- include('../partials/errors') %>
 
-                <!-- ⚡ IMPORTANTE: enctype para enviar archivos -->
-                <form action="/users/register" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="full-name">Nombre</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="full-name" type="text" placeholder="Ej: Juan"
-                               name="firstName" value="<%= (oldData && oldData.firstName) || '' %>" required/>
-                    </div>
+            <form action="/users/register" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="label" for="first-name">Nombre</label>
+                    <input class="input" id="first-name" type="text" placeholder="Juan" name="firstName"
+                           value="<%= (locals.oldData && oldData.firstName) || '' %>" autocomplete="given-name" required/>
+                </div>
+                <div>
+                    <label class="label" for="last-name">Apellido</label>
+                    <input class="input" id="last-name" type="text" placeholder="Pérez" name="lastName"
+                           value="<%= (locals.oldData && oldData.lastName) || '' %>" autocomplete="family-name" required/>
+                </div>
+                <div>
+                    <label class="label" for="email">Email</label>
+                    <input class="input" id="email" type="email" placeholder="jperez@mail.com" name="email"
+                           value="<%= (locals.oldData && oldData.email) || '' %>" autocomplete="email" required/>
+                </div>
+                <div>
+                    <label class="label" for="password">Contraseña</label>
+                    <input class="input" id="password" type="password" placeholder="Mínimo 8 caracteres" name="password"
+                           autocomplete="new-password" required/>
+                    <p class="hint">Al menos una mayúscula, una minúscula y un número.</p>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="label" for="image">Foto de perfil (opcional)</label>
+                    <input type="file" name="image" id="image" accept="image/jpeg,image/png,image/webp" class="input"/>
+                    <p class="hint">JPG, PNG o WEBP de hasta 2MB.</p>
+                </div>
+                <div class="md:col-span-2">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">Crear cuenta</button>
+                </div>
+            </form>
 
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="last-name">Apellido</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="last-name" type="text" placeholder="Ej: Pérez"
-                               name="lastName" value="<%= (oldData && oldData.lastName) || '' %>" required/>
-                    </div>
+            <p class="text-sm text-body text-center mt-6">
+                ¿Ya tenés cuenta? <a href="/users/login" class="text-ink font-medium underline">Ingresá</a>
+            </p>
+        </div>
+    </main>
 
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="email">Email</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="last-name" type="text" placeholder="Ej: Pérez"
-                               name="lastName" value="<%= (oldData && oldData.lastName) || '' %>" required/>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="password">Contraseña</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="password" type="password" placeholder="Mínimo 8 caracteres" 
-                               name="password" required/>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="dob">Fecha de Nacimiento</label>
-                        <input class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                               id="dob" type="date" name="dob"/>
-                    </div>
-
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="gender">Género</label>
-                        <select class="mt-1 w-full p-3 bg-gray-50 border border-gray-300 rounded-lg" 
-                                id="gender" name="gender">
-                            <option value="">Selecciona tu género</option>
-                            <option value="masculino">Masculino</option>
-                            <option value="femenino">Femenino</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                    </div>
-
-                    <!-- 📸 Campo de imagen de perfil -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-700" for="image">Foto de Perfil</label>
-                        <input type="file" name="image" id="image" accept="image/*" 
-                               class="mt-1 w-full p-2 border border-gray-300 rounded-lg"/>
-                    </div>
-
-                    <!-- Botón principal -->
-                    <div class="col-span-1 md:col-span-2">
-                        <button class="w-full p-3 bg-cyan-500 text-white rounded-lg font-semibold hover:bg-cyan-600 transition-colors" type="submit">
-                            Registrarse
-                        </button>
-                    </div>
-
-                    <div class="col-span-1 md:col-span-2 text-center mt-4">
-                        <div class="flex items-center">
-                            <hr class="w-full border-gray-300"/>
-                            <span class="px-4 text-xs text-gray-500 whitespace-nowrap">
-                                ¿YA TIENES CUENTA? 
-                                <a href="/login" class="text-cyan-600 hover:text-cyan-700 font-semibold">INICIA SESIÓN</a>
-                            </span>
-                            <hr class="w-full border-gray-300"/>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </main>
-    </div>
     <%- include('../partials/footer') %>
 </body>
 </html>

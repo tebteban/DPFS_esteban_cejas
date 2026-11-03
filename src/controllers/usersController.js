@@ -34,7 +34,7 @@ const usersController = {
         email: req.body.email,
         password: hashedPassword,
         role: 'customer',
-        image: req.file ? `/img/users/${req.file.filename}` : '/img/users/default.jpg'
+        image: req.file ? `/img/users/${req.file.filename}` : null
       });
 
 
@@ -98,6 +98,7 @@ const usersController = {
         res.cookie('rememberUser', user.id, {
           maxAge: 1000 * 60 * 60 * 24 * 90,
           httpOnly: true,
+          signed: true,
           sameSite: 'lax',
           secure: (process.env.NODE_ENV || 'development') === 'production'
         });

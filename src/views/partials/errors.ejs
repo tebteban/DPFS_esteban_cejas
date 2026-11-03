@@ -1,0 +1,11 @@
+<% if (locals.errors && errors.length) { %>
+    <div class="alert mb-6" role="alert">
+        <span class="material-icons-outlined">error_outline</span>
+        <div>
+            <strong class="font-medium block mb-1">Revisá los siguientes puntos:</strong>
+            <ul class="list-disc ml-4 space-y-1 text-body">
+                <% errors.forEach(error => { %><li><%= error.msg %></li><% }) %>
+            </ul>
+        </div>
+    </div>
+<% } %>

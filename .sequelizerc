@@ -1,0 +1,6 @@
+const path = require('path');
+
+// config.json se reemplazó por config.js (SQLite en desarrollo)
+module.exports = {
+  config: path.resolve('config', 'config.js')
+};

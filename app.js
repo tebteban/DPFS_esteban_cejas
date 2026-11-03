@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Configuración de sesiones y cookies ---
-app.use(cookieParser());
+app.use(cookieParser(SESSION_SECRET)); // firma la cookie rememberUser para que no se pueda falsificar
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
@@ -75,6 +75,10 @@ db.sequelize.authenticate()
 // Middleware para recordar al usuario
 app.use(rememberMiddleware);
 
+// Helpers de imagen disponibles en todas las vistas (fallback si falta la foto)
+app.locals.productImg = (img) => !img || img === 'default.jpg' ? '/img/products/default.svg' : img.startsWith('/') ? img : '/img/products/' + img;
+app.locals.avatarImg = (img) => !img || img.endsWith('default.jpg') ? '/img/users/default.svg' : img;
+
 // Middleware ÚNICO para pasar el usuario a todas las vistas (res.locals.user)
 app.use((req, res, next) => {
   res.locals.user = req.session.userLogged || null; 
@@ -94,16 +98,36 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
   }
 });
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  // Si el archivo no es imagen se descarta y la validación avisa al usuario
+  fileFilter: (req, file, cb) => cb(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype))
+});
 
 // --- Rutas principales ---
 const mainRoutes = require('./src/routes/mainRoutes');
 const usersRoutes = require('./src/routes/usersRoutes');
 const productsRoutes = require('./src/routes/productsRoutes')(upload);
+const adminRoutes = require('./src/routes/adminRoutes');
 
 app.use('/', mainRoutes);
 app.use('/users', usersRoutes);
 app.use('/productos', productsRoutes);
+app.use('/admin', adminRoutes);
+
+// --- 404 y manejo de errores ---
+app.use((req, res) => {
+  res.status(404).render('users/error', { message: 'La página que buscás no existe.' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  const message = err instanceof multer.MulterError || err.message?.startsWith('Solo se permiten')
+    ? 'La imagen debe ser JPG, PNG o WEBP de hasta 2MB.'
+    : 'Algo salió mal. Por favor, intentá de nuevo más tarde.';
+  res.status(err instanceof multer.MulterError ? 400 : 500).render('users/error', { message });
+});
 
 // --- Inicio del servidor ---
 app.listen(PORT, () => {

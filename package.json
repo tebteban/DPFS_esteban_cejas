@@ -4,6 +4,7 @@
   "description": "SpikeShop. Sitio dedicado a vender todo lo que un jugador de voely necesita, con foco en voley indoor.",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,6 +29,7 @@
     "mysql2": "^3.15.2",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
+    "sqlite3": "^6.0.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^11.1.0"
